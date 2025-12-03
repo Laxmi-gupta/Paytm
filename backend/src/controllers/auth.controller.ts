@@ -1,5 +1,5 @@
 import type { Request,Response } from "express"
-import type { authSchema } from "../validations/auth.schema.js"
+import { authSchema } from "../validations/auth.schema.js"
 import { PrismaClient } from "@prisma/client"
 import {z} from "zod"
 import bcrypt from "bcrypt"
@@ -12,7 +12,10 @@ const prisma = new PrismaClient();
 export class Auth {
   static login = async (req:Request,res:Response) => {
     try {
-      const {email,password} = req.body as z.infer<typeof authSchema.login> 
+      const validated = authSchema.login.safeParse(req.body);
+      console.log(validated);
+      if(!validated.success) return Send.error(res,null,"Invalid input");
+      const {email,password} = validated.data;
       const user = await prisma.user.findUnique({where: {email}});
     
       if(!user) {
@@ -66,7 +69,10 @@ export class Auth {
 
   static register = async (req:Request,res:Response) => {
     try {
-      const {name,email,password} = req.body as z.infer<typeof authSchema.register>;
+      const validated = authSchema.register.safeParse(req.body);
+      console.log(validated);
+      if(!validated.success) return Send.error(res,null,"Invalid input");
+      const {name,email,password,number} = validated.data;
       const hashedPassword = await bcrypt.hash(password,10);
   
       const exisited = await prisma.user.findUnique({where: {email}})
@@ -74,7 +80,7 @@ export class Auth {
         return Send.error(res, null, "Email already exists.");
       }
   
-      const user = await prisma.user.create({data: {name,email,password:hashedPassword}});
+      const user = await prisma.user.create({data: {name,email,password:hashedPassword,number}});
       return Send.success(res, {
           id: user.id,
           name: user.name,
@@ -90,7 +96,6 @@ export class Auth {
     try {
      
       const userId = (req as any).userId;
-       console.log(userId);
       if(userId) {
         await prisma.user.update({where: {id: userId},data: {refreshToken:null}});
       }

@@ -1,4 +1,4 @@
-import {z} from "zod";
+import {number, z} from "zod";
 
 const login = z.object({
   email: z.string().min(1,"Email is required").email({message:"Invalid email format"}),
@@ -8,7 +8,8 @@ const login = z.object({
 const register = z.object({
   name: z.string(),
   email: z.string().min(1,"Email is required").email({message:"Invalid email format"}),
-  password: z.string().min(1,"Password is required")
+  password: z.string().min(1,"Password is required"),
+  number: z.string().min(10).max(10)
 })
 
 export const authSchema = {

@@ -11,6 +11,7 @@ export class AuthMiddleware {
   static authenticateUser = (req:Request,res:Response,next: NextFunction) => {
     try {
       const token = req.cookies.accessToken;
+      console.log(token)
       if(!token) {
         return Send.error(res,null,"Token not exists");
       }

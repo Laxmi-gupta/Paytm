@@ -15,8 +15,48 @@ datasource db {
 
 model User {
   id Int @id @default(autoincrement())
-  name      String
+  name      String?
   email String @unique
   password String
   refreshToken String? @unique
+  number String @unique
+  OnRampTransaction OnRampTransaction[] 
+  Balance Balance[]      // 1 user can hv only 1 wallet 
+}
+
+model OnRampTransaction { // money deposits => paytm wallet add
+  id Int @id @default(autoincrement())
+  status onRampStatus 
+  startTime DateTime
+  amount Int 
+  provider String      // bank name
+  token String @unique 
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Balance {    // wallet
+  id Int @id @default(autoincrement())
+  amount Int 
+  locked Int   // this money which cant use useedd dirctly when someone is trying to pay
+  userId Int @unique
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Merchant {
+  id Int @id @default(autoincrement())
+  name String?
+  email String @unique
+  auth_type AuthType
+}
+
+enum onRampStatus {
+  Success
+  Failure
+  Processing
+}
+
+enum AuthType {
+  Google
+  Github
 }
