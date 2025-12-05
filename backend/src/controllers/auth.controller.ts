@@ -69,8 +69,8 @@ export class Auth {
 
   static register = async (req:Request,res:Response) => {
     try {
+      console.log(req.body);
       const validated = authSchema.register.safeParse(req.body);
-      console.log(validated);
       if(!validated.success) return Send.error(res,null,"Invalid input");
       const {name,email,password,number} = validated.data;
       const hashedPassword = await bcrypt.hash(password,10);

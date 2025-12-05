@@ -21,9 +21,10 @@ model User {
   refreshToken String? @unique
   number String @unique
   OnRampTransaction OnRampTransaction[] 
-  Balance Balance[]      // 1 user can hv only 1 wallet 
+  Balance Balance?     // 1 user can hv only 1 wallet 
 }
 
+//adding money from bank
 model OnRampTransaction { // money deposits => paytm wallet add
   id Int @id @default(autoincrement())
   status onRampStatus 
@@ -37,8 +38,8 @@ model OnRampTransaction { // money deposits => paytm wallet add
 
 model Balance {    // wallet
   id Int @id @default(autoincrement())
-  amount Int 
-  locked Int   // this money which cant use useedd dirctly when someone is trying to pay
+  amount Int @default(0)  // available balance
+  locked Int   // prevents double spending same money cant be spent twice
   userId Int @unique
   user User @relation(fields: [userId], references: [id])
 }
