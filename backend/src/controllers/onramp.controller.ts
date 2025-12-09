@@ -3,9 +3,10 @@ import { PrismaClient } from "@prisma/client";
 import { Send } from "../utils/response.utils.js";
 import { onRampSchema } from "../validations/onramp.schema.js";
 import crypto from "crypto"
+import axios from "axios";
 const prisma = new PrismaClient()
 
- class OnRamp {
+export class OnRamp {
   static createTransaction = async(req:Request,res:Response) => {
     try {
       const userId = (req as any).userId; 
@@ -13,25 +14,27 @@ const prisma = new PrismaClient()
       if(!validated.success) return Send.error(res,"Invalid input");
 
       const {amount} = validated.data;
-      const token = crypto.randomBytes(32).toString("hex");
-      // const user = await prisma.user.findUnique({where: {id:userId}});
+      
+      const response = await axios.post("http://localhost:3001/bank/make-payment",{
+        userId,amount
+      })
+      console.log(response);
       await prisma.onRampTransaction.create({
         data: {
           startTime: new Date(),
           amount,
           provider: "HDFC",
-          token,  
+          token: response.data.token, 
           userId,
           status: "Processing"
-          // user
         }
       })
       return Send.success(res,{
         amount,
-        token,
-        redirectUrl: `http://localhost:3000/bank/pay?token=${token}`
+        token: response.data.token,
+        paymentUrl: response.data.paymentUrl  
       });
-      // frontend will redirct to bank pay page with the token
+      
     } catch(error) {
       console.log("create Transaction failed",error);
       return Send.error(res,"create Transaction failed");

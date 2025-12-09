@@ -1,5 +1,5 @@
 import type { Request,Response } from "express"
-import { authSchema } from "../validations/auth.schema.js"
+import { authSchema } from "shared-validation-schemas"
 import { PrismaClient } from "@prisma/client"
 import {z} from "zod"
 import bcrypt from "bcrypt"
@@ -109,6 +109,7 @@ export class Auth {
       res.status(500).json({success:false,message: "Logout failed"});
     }
   }
+
 
   static refreshToken = async(req:Request,res:Response) => {
     try{
