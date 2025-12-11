@@ -26,11 +26,11 @@ app.post('/login',Auth.login);
 
 app.post('/logout',AuthMiddleware.authenticateUser,Auth.logout);
 
-app.post('/refresh-token',AuthMiddleware.RefreshTokenValidation,Auth.refreshToken,() => {
-  
-})
+app.post('/refresh-token',AuthMiddleware.RefreshTokenValidation,Auth.refreshToken);
 
 app.post('/transaction',AuthMiddleware.authenticateUser,OnRamp.createTransaction);
+
+app.post('/dbUpdate',OnRamp.databaseUpdate);
 
 app.listen(appConfig.port,() => {
   console.log(`listening at port ${appConfig.port}`)

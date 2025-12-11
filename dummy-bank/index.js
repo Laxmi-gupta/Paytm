@@ -1,5 +1,6 @@
 import express from "express";
 import crypto from "crypto";
+import axios from "axios";
 
 const app = express();
 app.use(express.json());   // if we need access req.body we need to convert it in json
@@ -48,10 +49,13 @@ app.get('/bank/pay',(req,res) => {
   `)
 })
 
-app.post('/bank/pay/complete',(req,res) => {
+app.post('/bank/pay/complete',async(req,res) => {
   const token = req.query.token;
+  const {userId,amount} = payment[token];
   if(!payment[token]) return res.json({message:"Token invalid"});
   payment[token].status="success";
+  const webhook  = await axios.post('http://localhost:3002/webhooks',{token,userId,amount});
+  console.log("webhook",webhook);
   return res.status(200).json({data:payment});  // updated wala ayega
 })
 
