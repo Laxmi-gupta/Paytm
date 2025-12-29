@@ -23,7 +23,7 @@ export class OnRamp {
         data: {
           startTime: new Date(),
           amount,
-          provider: "HDFC",
+          provider: "SBI",
           token: response.data.token, 
           userId,
           status: "Processing"
@@ -47,7 +47,7 @@ export class OnRamp {
         await prisma.$transaction([
             prisma.balance.updateMany({
                 where: {
-                    userId: Number(userId)
+                    userId: Number(userId)  
                 },
                 data: {
                     amount: {

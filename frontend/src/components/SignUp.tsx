@@ -23,23 +23,114 @@ export const  SignUp: React.FC = () => {
   const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const res = await saveUser(formData);
-    console.log(res.data);
+    console.log(res.message);
   }
 
   // console.log(formData); //React component = a function. This entire function runs AGAIN every time state changes.
-  return (
-    <>
-      <form onSubmit={handleSubmit}> 
-        <label htmlFor="fname">Name:</label>
-        <input type="text" name="name" id="fname" onChange={handleChange}/>
-        <label htmlFor="email">Email:</label>
-        <input type="email" name="email" id="email" onChange={handleChange}/>
-        <label htmlFor="password">Password:</label>
-        <input type="password" name="password" id="password" onChange={handleChange}/>
-        <label htmlFor="number">Number:</label>
-        <input type="text" name="number" id="number" onChange={handleChange}/>
-        <button >Sign Up</button>
-      </form>
-    </>
-  )
+
+   return (
+     <div className="min-h-screen bg-blue-600 flex">
+     {/* <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 items-center px-4"> */}
+      <div className="w-full h-screen grid grid-cols-1 md:grid-cols-2">
+        {/* LEFT BACKGROUND */}
+      <div
+        className="hidden md:block h-full bg-cover bg-center"
+        style={{ backgroundImage: "url('/bg.png')" }}
+      />
+      
+        {/* RIGHT SECTION (FORM CARD) */}
+        <div className="flex items-center justify-center">
+          <form
+            onSubmit={handleSubmit}
+            className="bg-white w-full max-w-[420px] rounded-2xl shadow-lg p-6 space-y-1"
+          >
+            {/* <img src="/logo.png" className="w-32 mx-auto font-bold"/> */}
+            <h2 className="text-2xl font-semibold text-center">
+               Sign Up
+            </h2>
+
+            {/* Name */}
+            <div className="mb-4">
+              <div className="flex items-center gap-4">
+                <img src="/src/assets/download.svg" />
+                <div className="w-full">
+                  <label className="text-sm text-gray-600">Name</label>                 
+                  <input
+                    type="text"
+                    name="name"
+                    onChange={handleChange}
+                    className="w-full border-b text-sm border-gray-300 focus:border-blue-500 outline-none py-1"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Email */}
+            <div className="mb-4">
+              <div className="flex items-center gap-4">
+                <img src="/src/assets/download.svg" />
+                <div className="w-full">
+                  <label className="text-sm text-gray-600">Email</label>                 
+                  <input
+                    type="email"
+                    name="email"
+                    onChange={handleChange}
+                    className="w-full border-b text-sm border-gray-300 focus:border-blue-500 outline-none py-1"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Password */}
+            <div className="mb-4">
+              <div className="flex items-center gap-4">
+                <img src="/src/assets/password.svg" />
+                <div className="w-full">
+                  <label className="text-sm text-gray-600">Password</label>                 
+                  <input
+                    type="password"
+                    name="password"
+                    onChange={handleChange}
+                    className="w-full border-b text-sm border-gray-300 focus:border-blue-500 outline-none py-1"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Phone */}
+            <div className="mb-4">
+              <div className="flex items-center gap-4">
+                <img src="/src/assets/download.svg" />
+                <div className="w-full">
+                  <label className="text-sm text-gray-600">Phone Number</label>                 
+                  <input
+                    type="text"
+                    name="number"
+                    onChange={handleChange}
+                    className="w-full border-b text-sm border-gray-300 focus:border-blue-500 outline-none py-1"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Button */}
+            <button
+              type="submit"
+              className="w-full bg-blue-500 text-white py-3 rounded-full mt-4 hover:bg-blue-600 transition"
+            >
+              SIGN UP
+            </button>
+
+            <p className="text-center text-sm text-gray-500">
+              Already have an account?{" "}
+              <span className="text-blue-500 cursor-pointer">
+                Login
+              </span>
+            </p>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  );
 }

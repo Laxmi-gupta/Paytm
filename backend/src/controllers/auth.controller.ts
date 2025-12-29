@@ -71,10 +71,11 @@ export class Auth {
     try {
       console.log(req.body);
       const validated = authSchema.register.safeParse(req.body);
+      
       if(!validated.success) return Send.error(res,null,"Invalid input");
       const {name,email,password,number} = validated.data;
       const hashedPassword = await bcrypt.hash(password,10);
-  
+      
       const exisited = await prisma.user.findUnique({where: {email}})
       if(exisited) {
         return Send.error(res, null, "Email already exists.");
