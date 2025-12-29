@@ -7,7 +7,7 @@ export const Layout: React.FC = () => {
   return (
     <div>
       <Navbar />
-      <Outlet />
+      <Outlet />  
       <Footer />
     </div>
   )

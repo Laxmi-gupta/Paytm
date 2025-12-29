@@ -2,6 +2,7 @@ import type React from "react";
 import { useState } from "react";
 import { saveUser } from "../services/signupService";
 import type { signUpSchema } from "../types/auth.types";
+import { Link } from "react-router-dom";
 
 export const  SignUp: React.FC = () => {
   const [formData,setFormData] = useState<signUpSchema>({
@@ -29,17 +30,17 @@ export const  SignUp: React.FC = () => {
   // console.log(formData); //React component = a function. This entire function runs AGAIN every time state changes.
 
    return (
-     <div className="min-h-screen bg-blue-600 flex">
+     <div className="min-h-screen flex">
      {/* <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 items-center px-4"> */}
-      <div className="w-full h-screen grid grid-cols-1 md:grid-cols-2">
+      {/* <div className="relative w-full h-screen"> */}
         {/* LEFT BACKGROUND */}
       <div
-        className="hidden md:block h-full bg-cover bg-center"
-        style={{ backgroundImage: "url('/bg.png')" }}
-      />
+        className="absolute w-full h-full bg-cover bg-center"
+        style={{ backgroundImage: "url('/image.png')" }}
+      >
       
         {/* RIGHT SECTION (FORM CARD) */}
-        <div className="flex items-center justify-center">
+        <div className="flex items-center justify-center relative z-100 pt-24">
           <form
             onSubmit={handleSubmit}
             className="bg-white w-full max-w-[420px] rounded-2xl shadow-lg p-6 space-y-1"
@@ -123,9 +124,9 @@ export const  SignUp: React.FC = () => {
 
             <p className="text-center text-sm text-gray-500">
               Already have an account?{" "}
-              <span className="text-blue-500 cursor-pointer">
+              <Link className="text-blue-500 cursor-pointer" to="/login">
                 Login
-              </span>
+              </Link>
             </p>
           </form>
         </div>

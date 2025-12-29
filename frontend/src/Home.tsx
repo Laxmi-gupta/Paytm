@@ -21,14 +21,9 @@ export const Home: React.FC = () => {
             </div>
             
             <div className="absolute  right-[-80px] -translate-y-1/2 top-1/2 md:w-[360px] ">
-              <div className="bg-gradient-to-br from-blue-500 to-green-400 
-                              rounded-3xl h-[360px] 
-                              flex items-center justify-center 
-                              shadow-xl">
-                <h2 className="text-white text-4xl font-bold text-center">
-                  Payx <br />
-                </h2>
-              </div>
+              
+                <img src="/gradient.png" alt="" />
+             
             </div>
           </div>
           

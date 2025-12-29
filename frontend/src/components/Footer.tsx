@@ -2,7 +2,7 @@ import type React from "react";
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="bg-white border-t">
+    <footer className="bg-white ">
       <div className="max-w-7xl mx-auto px-6 py-16">
 
         {/* TOP SECTION */}
@@ -12,7 +12,7 @@ export const Footer: React.FC = () => {
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
               <div className=" rounded-full"><img src="/logo.png" className="w-30"/></div>
-              <span className="text-xl font-bold">Payx</span>
+              <span className="text-xl font-bold">PayX</span>
             </div>
 
             <p className="text-gray-600 max-w-sm">
