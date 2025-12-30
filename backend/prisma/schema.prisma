@@ -24,7 +24,7 @@ model User {
   Balance Balance?     // 1 user can hv only 1 wallet 
 }
 
-//adding money from bank
+//adding money from bank   
 model OnRampTransaction { // money deposits => paytm wallet add
   id Int @id @default(autoincrement())
   status onRampStatus 
@@ -43,6 +43,7 @@ model Balance {    // wallet
   userId Int @unique
   user User @relation(fields: [userId], references: [id])
 }
+
 
 model Merchant {
   id Int @id @default(autoincrement())

@@ -20,9 +20,8 @@ export const Home: React.FC = () => {
                 </p>
             </div>
             
-            <div className="absolute  right-[-80px] -translate-y-1/2 top-1/2 md:w-[360px] ">
-              
-                <img src="/gradient.png" alt="" />
+            <div className="absolute right-[-80px] -translate-y-1/2 top-1/2 md:w-[360px] ">
+              <img src="/gradient.png" alt="" />
              
             </div>
           </div>

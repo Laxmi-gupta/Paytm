@@ -81,7 +81,22 @@ export class Auth {
         return Send.error(res, null, "Email already exists.");
       }
   
-      const user = await prisma.user.create({data: {name,email,password:hashedPassword,number}});
+      const user = await prisma.user.create({
+        data: {
+          name,email,password:hashedPassword,number,
+          Balance: {                    // update balance during signup
+            create:{
+              amount: 10_000,
+              locked: 0
+            }
+          }
+        }
+      });
+
+      // if(user.Balance==null) {
+      //   await prisma.balance.update({where: {userId:user.id},data:{amount: 10_000}});
+      // }
+
       return Send.success(res, {
           id: user.id,
           name: user.name,

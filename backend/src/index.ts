@@ -5,6 +5,7 @@ import { appConfig } from "./config/app.config.js";
 import { AuthMiddleware } from "./middlewares/auth.middlewares.js";
 import { OnRamp } from "./controllers/onramp.controller.js";
 import cors from "cors";
+import { p2p } from "./controllers/p2p.controller.js";
 
 const app = express();
 
@@ -31,6 +32,8 @@ app.post('/refresh-token',AuthMiddleware.RefreshTokenValidation,Auth.refreshToke
 app.post('/transaction',AuthMiddleware.authenticateUser,OnRamp.createTransaction);
 
 app.post('/dbUpdate',OnRamp.databaseUpdate);
+
+app.post('/p2p',p2p.p2pTransfer);
 
 app.listen(appConfig.port,() => {
   console.log(`listening at port ${appConfig.port}`)

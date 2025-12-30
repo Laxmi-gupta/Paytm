@@ -1,30 +1,22 @@
 import type React from "react";
-import { useState } from "react";
-import { saveUser } from "../services/signupService";
+import { saveUser } from "../services/authService";
 import type { signUpSchema } from "../types/auth.types";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
 
 export const  SignUp: React.FC = () => {
-  const [formData,setFormData] = useState<signUpSchema>({
-    name: "",
-    email: "",
-    password: "",
-    number: ""
-  });
+  const {register,handleSubmit,formState: {errors}} = useForm<signUpSchema>();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //console.log(e.target.name,e.target.value);
+  const navigate = useNavigate();
 
-    setFormData((prev) => ({       // without states react dont re render anything
-      ...prev,           // keeps old values alive.
-      [e.target.name]: e.target.value    // all value are stored like obj formateg: formData["email"] = "l"
-    }))
-  }
-
-  const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onSubmit = async(formData:signUpSchema) => {
+    try {
     const res = await saveUser(formData);
-    console.log(res.message);
+    console.log(res);
+    navigate('/login');
+    } catch(ex) {
+      console.error("signup eror",ex);
+    }
   }
 
   // console.log(formData); //React component = a function. This entire function runs AGAIN every time state changes.
@@ -38,11 +30,9 @@ export const  SignUp: React.FC = () => {
         className="absolute w-full h-full bg-cover bg-center"
         style={{ backgroundImage: "url('/image.png')" }}
       >
-      
-        {/* RIGHT SECTION (FORM CARD) */}
         <div className="flex items-center justify-center relative z-100 pt-24">
           <form
-            onSubmit={handleSubmit}
+            onSubmit={handleSubmit(onSubmit)}
             className="bg-white w-full max-w-[420px] rounded-2xl shadow-lg p-6 space-y-1"
           >
             {/* <img src="/logo.png" className="w-32 mx-auto font-bold"/> */}
@@ -58,10 +48,10 @@ export const  SignUp: React.FC = () => {
                   <label className="text-sm text-gray-600">Name</label>                 
                   <input
                     type="text"
-                    name="name"
-                    onChange={handleChange}
+                    {...register("name",{required: "Name is required"})}
                     className="w-full border-b text-sm border-gray-300 focus:border-blue-500 outline-none py-1"
                   />
+                  {errors.name && <p className="text-red-500">{errors.name.message}</p>}
                 </div>
               </div>
             </div>
@@ -74,10 +64,13 @@ export const  SignUp: React.FC = () => {
                   <label className="text-sm text-gray-600">Email</label>                 
                   <input
                     type="email"
-                    name="email"
-                    onChange={handleChange}
+                    {...register("email",{required: "Email is required", pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: "Enter a valid email address",
+                    },})}
                     className="w-full border-b text-sm border-gray-300 focus:border-blue-500 outline-none py-1"
                   />
+                  {errors.email && <p className="text-red-500">{errors.email.message}</p>}
                 </div>
               </div>
             </div>
@@ -90,10 +83,10 @@ export const  SignUp: React.FC = () => {
                   <label className="text-sm text-gray-600">Password</label>                 
                   <input
                     type="password"
-                    name="password"
-                    onChange={handleChange}
+                    {...register("password",{required: "Password is required"})}
                     className="w-full border-b text-sm border-gray-300 focus:border-blue-500 outline-none py-1"
                   />
+                  {errors.password && <p className="text-red-500">{errors.password.message}</p>}
                 </div>
               </div>
             </div>
@@ -106,10 +99,13 @@ export const  SignUp: React.FC = () => {
                   <label className="text-sm text-gray-600">Phone Number</label>                 
                   <input
                     type="text"
-                    name="number"
-                    onChange={handleChange}
+                    {...register("number",{required: "Number is required",pattern: {
+                      value: /^[6-9]\d{9}$/,
+                      message: "Enter valid 10-digit mobile number",
+                    },})}
                     className="w-full border-b text-sm border-gray-300 focus:border-blue-500 outline-none py-1"
                   />
+                  {errors.number && <p className="text-red-500">{errors.number.message}</p>}
                 </div>
               </div>
             </div>

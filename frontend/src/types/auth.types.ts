@@ -4,3 +4,9 @@ export interface signUpSchema {
   password: string,
   number: string
 }
+
+
+export interface loginSchema {
+  email:string,
+  password:string
+}
