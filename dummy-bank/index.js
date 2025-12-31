@@ -51,6 +51,7 @@ app.get('/bank/pay',(req,res) => {
 
 app.post('/bank/pay/complete',async(req,res) => {
   const token = req.query.token;
+  console.log("trans complete token",token)
   const {userId,amount} = payment[token];
   if(!payment[token]) return res.json({message:"Token invalid"});
   payment[token].status="success";

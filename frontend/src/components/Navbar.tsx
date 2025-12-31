@@ -10,6 +10,10 @@ export const Navbar: React.FC = () => {
           <Link  to='/login' className="rounded-full border px-6 py-2 hover:bg-blue-100 transition">Log in</Link>
           <Link  to='/signup' className="rounded-full border px-6 py-2 bg-blue-500 text-white hover:bg-blue-400  transition">Sign up</Link>
         </div>
+
+        <div className="flex gap-4 items-center">
+          <Link  to='/logout' className="rounded-full border px-6 py-2 hover:bg-blue-100 transition">Log out</Link>
+        </div>
       </div>
     </nav>
   )

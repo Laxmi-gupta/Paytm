@@ -13,7 +13,7 @@ export const Login: React.FC = () => {
     try {
     const res = await logInUser(data);
     console.log(res.data);
-    navigate('/transactions');
+    navigate('/transaction');
     } catch(ex) {
       console.error("signup eror",ex);
     }

@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { loginSchema, signUpSchema } from "../types/auth.types";
 
-const URL = "http://localhost:3000";
+const URL = import.meta.env.VITE_API_URL;
 
 export const saveUser = async(formData: signUpSchema) => {
   try {

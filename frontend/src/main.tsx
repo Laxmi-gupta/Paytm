@@ -16,7 +16,7 @@ const router = createBrowserRouter([
     children: [{
       path: '/',element: <Home/>  
     },{
-      path:'/transactions',element: <Transactions />
+      path:'/transaction',element: <Transactions />         
     },{
       path: '/p2p', element: <P2P/>
     }]

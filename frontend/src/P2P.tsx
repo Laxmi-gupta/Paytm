@@ -1,6 +1,5 @@
 import React from "react"
 import { useForm } from "react-hook-form"
-import type { p2pSchema } from "./types/trans";
 import { saveP2pData } from "./services/transService";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod"
@@ -19,7 +18,7 @@ export const P2P:React.FC = () => {
     }
   );
 
-  const onSubmit = async(data:p2pSchema) => {
+  const onSubmit = async(data:Payment) => {
     console.log(data);
     const res = await saveP2pData(data);
     console.log(res);

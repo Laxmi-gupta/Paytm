@@ -10,10 +10,11 @@ interface decodedTok {
 export class AuthMiddleware {
   static authenticateUser = (req:Request,res:Response,next: NextFunction) => {
     try {
-      const token = req.cookies.accessToken;
-      console.log(token)
+      console.log("cookies",req.cookies);
+      const token = req.cookies.accesstoken;
+      console.log("authenticate",token)
       if(!token) {
-        return Send.error(res,null,"Token not exists");
+        return Send.unAuthorized(res,null,"Token not exists");
       }
 
       const decodedToken = jwt.verify(token,authConfig.secret) as decodedTok;
@@ -22,7 +23,7 @@ export class AuthMiddleware {
       next();   // if not call then it will stuck here only
     } catch(error) {
       console.log("Authenticate user failed",error);
-      return Send.error(res,null,"Authenticate user");
+      return Send.unAuthorized(res,null,"Authenticate user");
     } 
   }
   
@@ -31,7 +32,6 @@ export class AuthMiddleware {
   static RefreshTokenValidation = (req:Request,res:Response,next:NextFunction) => {
     try {
       const refreshToken = req.cookies.refreshToken;
-      console.log(refreshToken);
       if(!refreshToken) {
         return Send.unAuthorized(res, { message: "No refresh token provided" });
       }

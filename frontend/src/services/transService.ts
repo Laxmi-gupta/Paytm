@@ -1,11 +1,11 @@
 import axios from "axios";
-import type { p2pSchema } from "../types/trans";
+import { api } from "../utils/axios";
 
-const URL = "http://localhost:3000";
+const URL = import.meta.env.VITE_API_URL;
 
-export const saveP2pData = async(data: p2pSchema) => {
+export const saveP2pData = async(data: any) => {
   try {
-    const res = await axios.post(`${URL}/p2p`,data);
+    const res = await api.post(`${URL}/p2p`,data);
     return res.data;
   } catch (error) {
     console.log("p2p service",error);

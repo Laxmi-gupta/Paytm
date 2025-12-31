@@ -6,8 +6,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.post('/webhooks', async (req, res) => {
     const { userId, amount, token } = req.body;
-    const data = await axios.post('http://localhost:3000/dbUpdate', { userId, amount, token });
-    console.log(data);
+    await axios.post('http://localhost:3000/dbUpdate', { userId, amount, token });
 });
 app.listen(3002, () => {
     console.log(`listening at port 3002`);

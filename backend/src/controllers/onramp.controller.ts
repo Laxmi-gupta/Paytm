@@ -10,10 +10,12 @@ export class OnRamp {
   static createTransaction = async(req:Request,res:Response) => {
     try {
       const userId = (req as any).userId; 
+      console.log("transac",userId);
       const validated = onRampSchema.createTrans.safeParse(req.body);
       if(!validated.success) return Send.error(res,"Invalid input");
-
-      const {amount} = validated.data;
+      
+      const {amount,provider} = validated.data;
+      if(amount<=0) return Send.error(res,"Invalid amount");
       
       const response = await axios.post("http://localhost:3001/bank/make-payment",{
         userId,amount
@@ -23,7 +25,7 @@ export class OnRamp {
         data: {
           startTime: new Date(),
           amount,
-          provider: "SBI",
+          provider,
           token: response.data.token, 
           userId,
           status: "Processing"
@@ -66,9 +68,7 @@ export class OnRamp {
             })
         ]);
 
-        res.json({
-            message: "Captured"
-        })
+        res.send("success");
 
     } catch(e) {
         console.error(e);

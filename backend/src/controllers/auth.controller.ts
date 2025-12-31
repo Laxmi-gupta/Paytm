@@ -152,7 +152,7 @@ export class Auth {
         sameSite:"strict",
         secure: process.env.NODE_ENV === "production"
       })
-
+      console.log("new access token",newAccessToken)
       return Send.success(res,"Access token refresh successfully")
     } catch(error) {
       console.log("Refresh token failed",error);
