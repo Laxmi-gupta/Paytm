@@ -8,30 +8,47 @@ const prisma = new PrismaClient();
 const p2pTypes = z.object({
   number: z.string(),
   amount: z.number()
+          
 })
 
 export class p2p {
   static p2pTransfer = async (req:Request,res:Response) => {
     const parsed = p2pTypes.safeParse(req.body);
-    console.log(parsed);
-
+    console.log(parsed)
     if(parsed.error) return Send.error(res,"Invalid input");
 
     const {number,amount} = parsed.data;
+
     const user = await prisma.user.findUnique({where: {number},
       include: {
         Balance:true
       }
     });
-    if(!user) return Send.error(res,"User not exists");
 
-    if(!user.Balance) return Send.error(res,"No wallet");
+    console.log("user",user)
 
-    if(user.Balance.amount < amount) return Send.error(res,"No enough money");
+    if(!user) {
+      console.log("not user")
+      return res.status(400).json({message:"User not exists"});
+    }
+    
+    await prisma.$transaction(async(tx) => {
+      if(!user.Balance) return Send.error(res,"No wallet");
 
-     // await prisma.balance.update({amount: user.Balance.amount-amount, locked:amount },where: {userId:user.id})
+      const userAmount = user.Balance.amount;
+      if(userAmount < amount) return Send.error(res,"Balance not sufficient");
+      
+      const balup = await tx.balance.update({
+        where: {userId:user.id},
+        data:{
+          amount:{increment: Number(amount) } 
+        }
+      })
 
-    return Send.success(res,user);
+      console.log(balup)
+    })
+
+    return Send.success(res,"balup");
 
   }
 }

@@ -18,12 +18,12 @@ export class OnRamp {
       if(amount<=0) return Send.error(res,"Invalid amount");
       
       const response = await axios.post("http://localhost:3001/bank/make-payment",{
-        userId,amount
+        userId,amount,provider
       })
-      console.log(response.data);  
-      await prisma.onRampTransaction.create({
+      //console.log(response.data);  
+      const ramp = await prisma.onRampTransaction.create({
         data: {
-          startTime: new Date(),
+          startTime: new Date(new Date().getTime() + (5.5 * 60 * 60 * 1000)),
           amount,
           provider,
           token: response.data.token, 
@@ -31,6 +31,9 @@ export class OnRamp {
           status: "Processing"
         }
       })
+      console.log("ramo created",ramp)
+      
+
       return Send.success(res,{
         amount,
         token: response.data.token,
@@ -45,6 +48,7 @@ export class OnRamp {
 
   static databaseUpdate = async(req:Request,res:Response) => {
     const {userId,amount,token} = req.body;
+    console.log("inside dbupadte")
       try {
         await prisma.$transaction([
             prisma.balance.updateMany({
@@ -67,8 +71,8 @@ export class OnRamp {
                 }
             })
         ]);
-
-        res.send("success");
+        console.log("database updated")
+        return res.status(200).json({message:"success"}) // mai pehle idar se bhej rhi thi 
 
     } catch(e) {
         console.error(e);
@@ -76,5 +80,30 @@ export class OnRamp {
             message: "Error while processing webhook"
         })
     }
+  }
+
+  static getTransaction = async(req:Request,res:Response) => {
+    try {
+      const token = req.query.token as string;
+      console.log(token); // we shld check both token and userId bcoz whose token is it we get to know but whether its authorized or not it shld be checked
+      if(!token) return Send.error(res,"Token missing");
+
+      const onrampData = await prisma.onRampTransaction.findUnique(
+        {
+          where:{token},
+          select:{amount:true,provider:true,startTime:true,status:true}
+        });
+
+      if (!onrampData) {
+        return Send.error(res, "Transaction not found");
+      }
+
+      return Send.success(res,onrampData);
+    } catch(error) {
+      console.error("get transaction failed",error);
+      return Send.error(res,"get Transaction failed");
+    }
+    
+
   }
 }

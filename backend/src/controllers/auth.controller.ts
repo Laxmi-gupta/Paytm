@@ -13,7 +13,7 @@ export class Auth {
   static login = async (req:Request,res:Response) => {
     try {
       const validated = authSchema.login.safeParse(req.body);
-      console.log(validated);
+      console.log("login backedn route",validated);
       if(!validated.success) return Send.error(res,null,"Invalid input");
       const {email,password} = validated.data;
       const user = await prisma.user.findUnique({where: {email}});
@@ -86,7 +86,7 @@ export class Auth {
           name,email,password:hashedPassword,number,
           Balance: {                    // update balance during signup
             create:{
-              amount: 10_000,
+              amount: 0,
               locked: 0
             }
           }

@@ -8,6 +8,7 @@ import { Layout } from './components/Layout'
 import { Home } from './Home'
 import { Transactions } from './Transactions'
 import { P2P } from './P2P'
+import { Success } from './Success'
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,9 @@ const router = createBrowserRouter([
   {
     path: '/login',
     element: <Login />
+  },{
+    path: '/success-payment',
+    element: <Success />
   }
 ])
 

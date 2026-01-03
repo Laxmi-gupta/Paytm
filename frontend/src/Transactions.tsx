@@ -3,13 +3,14 @@ import { useForm } from "react-hook-form";
 import { api } from "./utils/axios";
 
 export const Transactions: React.FC = () => {
-  const {register,handleSubmit,formState:{errors}} = useForm();
+  const {register,handleSubmit,formState:{errors},reset} = useForm();
 
   const onSubmit = async(data:any) => {
     try {
       const res = await api.post('/transaction',data);
       console.log("frotend calling",res.data.data.paymentUrl);
       window.location.href = (res.data.data.paymentUrl);
+      reset();
     } catch(error) {
       console.log("Transaction failed",error);
     }

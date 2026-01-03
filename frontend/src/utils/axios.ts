@@ -11,7 +11,7 @@ api.interceptors.response.use(
   (response) => response,
 
   async (error) => {
-    console.log(error);
+    // console.log(error);
     const originalReq = error.config;
     if(error.response?.status==401 && !originalReq._retry) {
       try {

@@ -6,6 +6,7 @@ import { AuthMiddleware } from "./middlewares/auth.middlewares.js";
 import { OnRamp } from "./controllers/onramp.controller.js";
 import cors from "cors";
 import { p2p } from "./controllers/p2p.controller.js";
+import axios from "axios";
 
 const app = express();
 
@@ -31,9 +32,19 @@ app.post('/refresh-token',AuthMiddleware.RefreshTokenValidation,Auth.refreshToke
 
 app.post('/transaction',AuthMiddleware.authenticateUser,OnRamp.createTransaction);
 
+app.post('/webhooks',async(req,res) => {
+  const {userId, amount, token}:any = req.body;  
+  console.log("inside webhooko ")
+  await axios.post('http://localhost:3000/dbUpdate',{userId, amount, token});
+  console.log("database updated")
+  return res.status(200).json({message:"db updated"})
+})
+
 app.post('/dbUpdate',OnRamp.databaseUpdate);
 
 app.post('/p2p',p2p.p2pTransfer);
+
+app.get('/transaction/status',AuthMiddleware.authenticateUser,OnRamp.getTransaction)
 
 app.listen(appConfig.port,() => {
   console.log(`listening at port ${appConfig.port}`)

@@ -2,6 +2,7 @@ import axios from "axios";
 import type { loginSchema, signUpSchema } from "../types/auth.types";
 
 const URL = import.meta.env.VITE_API_URL;
+console.log(URL)
 
 export const saveUser = async(formData: signUpSchema) => {
   try {
@@ -17,6 +18,7 @@ export const saveUser = async(formData: signUpSchema) => {
 }
 
 export const logInUser = async(formData:loginSchema) => {
+  console.log(formData)
   try {
     const res = await axios.post(`${URL}/login`,formData,{ withCredentials: true });
     return res.data;
