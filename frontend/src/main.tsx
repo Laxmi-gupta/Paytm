@@ -9,6 +9,8 @@ import { Home } from './Home'
 import { Transactions } from './Transactions'
 import { P2P } from './P2P'
 import { Success } from './Success'
+import {Toaster} from "react-hot-toast"
+import { Dashboard } from './Dashboard'
 
 const router = createBrowserRouter([
   {
@@ -16,6 +18,8 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [{
       path: '/',element: <Home/>  
+    },{
+      path: '/dashboard' ,element: <Dashboard />
     },{
       path:'/transaction',element: <Transactions />         
     },{
@@ -37,6 +41,7 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    <Toaster position='top-center' toastOptions={{duration:3000}}/>
     <RouterProvider router={router}  />
   </StrictMode>,
 )

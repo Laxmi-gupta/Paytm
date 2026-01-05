@@ -7,6 +7,7 @@ import { OnRamp } from "./controllers/onramp.controller.js";
 import cors from "cors";
 import { p2p } from "./controllers/p2p.controller.js";
 import axios from "axios";
+import { Dashboard } from "./controllers/dashboard.controller.js";
 
 const app = express();
 
@@ -25,6 +26,8 @@ app.get('/',(req,res) => {
 app.post('/signup',Auth.register);
 
 app.post('/login',Auth.login);
+
+app.get('/dashboard',AuthMiddleware.authenticateUser,Dashboard.getUser);
 
 app.post('/logout',AuthMiddleware.authenticateUser,Auth.logout);
 

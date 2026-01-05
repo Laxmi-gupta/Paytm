@@ -11,7 +11,7 @@ export const saveUser = async(formData: signUpSchema) => {
         'Content-Type': 'application/json',
       },
     });
-    return res.data;
+    return res;
   } catch (error) {
     console.log("signup service",error);
   }

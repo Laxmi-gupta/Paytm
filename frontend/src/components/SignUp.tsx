@@ -1,27 +1,43 @@
 import type React from "react";
 import { saveUser } from "../services/authService";
-import type { signUpSchema } from "../types/auth.types";
-import { Link, useNavigate } from "react-router-dom";
+import { data, Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import { authSchema, type SignupCred} from "shared-validation-schemas"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { api } from "../utils/axios";
 
 export const  SignUp: React.FC = () => {
-  const {register,handleSubmit,formState: {errors}} = useForm<signUpSchema>();
+  const {register,handleSubmit,formState: {errors,isSubmitting},reset} = useForm<SignupCred>(
+    {
+      resolver: zodResolver(authSchema.register)  // zod types
+    }
+  );
 
   const navigate = useNavigate();
 
-  const onSubmit = async(formData:signUpSchema) => {
+  const onSubmit = async(formData:SignupCred) => {
     try {
-    const res = await saveUser(formData);
-    console.log(res);
-    navigate('/login');
-    } catch(ex) {
-      console.error("signup eror",ex);
+      const res = await api.post('/signup',formData);
+      if(!res?.data.ok) {
+        toast.error(res.data.message);
+        return;
+      }
+
+      console.log(res.data.message);
+      toast.success(res.data.message);
+      
+      reset(); // Clear form
+      navigate("/dashboard"); 
+    
+    } catch(error:any) {
+      const msg = error?.response?.data.message || "Something went wrong"
+      console.error("signup eror",msg);
+      toast.error(msg)
     }
   }
 
-  // console.log(formData); //React component = a function. This entire function runs AGAIN every time state changes.
-
-   return (
+  return (
      <div className="min-h-screen flex">
      {/* <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 items-center px-4"> */}
       {/* <div className="relative w-full h-screen"> */}
@@ -48,7 +64,7 @@ export const  SignUp: React.FC = () => {
                   <label className="text-sm text-gray-600">Name</label>                 
                   <input
                     type="text"
-                    {...register("name",{required: "Name is required"})}
+                    {...register("name")}
                     className="w-full border-b text-sm border-gray-300 focus:border-blue-500 outline-none py-1"
                   />
                   {errors.name && <p className="text-red-500">{errors.name.message}</p>}
@@ -64,10 +80,7 @@ export const  SignUp: React.FC = () => {
                   <label className="text-sm text-gray-600">Email</label>                 
                   <input
                     type="email"
-                    {...register("email",{required: "Email is required", pattern: {
-                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                      message: "Enter a valid email address",
-                    },})}
+                    {...register("email")}
                     className="w-full border-b text-sm border-gray-300 focus:border-blue-500 outline-none py-1"
                   />
                   {errors.email && <p className="text-red-500">{errors.email.message}</p>}
@@ -83,7 +96,7 @@ export const  SignUp: React.FC = () => {
                   <label className="text-sm text-gray-600">Password</label>                 
                   <input
                     type="password"
-                    {...register("password",{required: "Password is required"})}
+                    {...register("password")}
                     className="w-full border-b text-sm border-gray-300 focus:border-blue-500 outline-none py-1"
                   />
                   {errors.password && <p className="text-red-500">{errors.password.message}</p>}
@@ -99,10 +112,7 @@ export const  SignUp: React.FC = () => {
                   <label className="text-sm text-gray-600">Phone Number</label>                 
                   <input
                     type="text"
-                    {...register("number",{required: "Number is required",pattern: {
-                      value: /^[6-9]\d{9}$/,
-                      message: "Enter valid 10-digit mobile number",
-                    },})}
+                    {...register("number")}
                     className="w-full border-b text-sm border-gray-300 focus:border-blue-500 outline-none py-1"
                   />
                   {errors.number && <p className="text-red-500">{errors.number.message}</p>}
@@ -114,8 +124,9 @@ export const  SignUp: React.FC = () => {
             <button
               type="submit"
               className="w-full bg-blue-500 text-white py-3 rounded-full mt-4 hover:bg-blue-600 transition"
+              disabled={isSubmitting}
             >
-              SIGN UP
+              {isSubmitting ? "Signing up...." : "Sign Up"}
             </button>
 
             <p className="text-center text-sm text-gray-500">

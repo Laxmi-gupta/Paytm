@@ -17,11 +17,13 @@
     "@mui/material": "^7.3.6",
     "@tailwindcss/vite": "^4.1.17",
     "axios": "^1.13.2",
+    "lucide-react": "^0.562.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.69.0",
     "react-hot-toast": "^2.6.0",
-    "react-router-dom": "^7.11.0"
+    "react-router-dom": "^7.11.0",
+    "shared-validation-schemas": "^2.0.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

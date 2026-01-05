@@ -6,6 +6,7 @@ import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { authConfig } from "../config/auth.config.js"
 import { Send } from "../utils/response.utils.js"
+import { generateToken } from "../utils/jwtToken.js"
 
 const prisma = new PrismaClient();
 
@@ -27,20 +28,10 @@ export class Auth {
         return Send.error(res,null,"Password is incorrect");
       }
 
-      const accessToken = jwt.sign(
-        {userId:user.id},
-        authConfig.secret,
-        {expiresIn:authConfig.secret_expires as any}
-      )
+      const {accessToken,refreshToken} = generateToken({id: user.id});
+      
+      await prisma.user.update({where: {id: user.id},data:{refreshToken}});
 
-      const refreshToken = jwt.sign(
-        {userId:user.id},
-        authConfig.refresh_secret,
-        {expiresIn:authConfig.refresh_expires as any}
-      )
-
-      await prisma.user.update({where: {email},data:{refreshToken}});
-      console.log(req.cookies);
       res.cookie("accessToken",accessToken,{
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
@@ -80,6 +71,11 @@ export class Auth {
       if(exisited) {
         return Send.error(res, null, "Email already exists.");
       }
+
+      const exisitedPhone = await prisma.user.findUnique({where: {number}})
+      if(exisitedPhone) {
+        return Send.error(res, null, "Phone number already exists.");
+      }
   
       const user = await prisma.user.create({
         data: {
@@ -93,15 +89,31 @@ export class Auth {
         }
       });
 
-      // if(user.Balance==null) {
-      //   await prisma.balance.update({where: {userId:user.id},data:{amount: 10_000}});
-      // }
+     const {accessToken,refreshToken} = generateToken({id: user.id});    
+     console.log("user token",user.id) 
+
+     await prisma.user.update({where: {id: user.id},data:{refreshToken}});
+
+      res.cookie("accessToken",accessToken,{
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 15*60*1000,
+        sameSite: "strict"
+      });
+
+      res.cookie("refreshToken",refreshToken,{
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 24*60*60*1000,
+        sameSite: "strict"
+      });
 
       return Send.success(res, {
           id: user.id,
           name: user.name,
           email: user.email
       },"User created succesfully")
+      
     } catch(error) {
       console.log("Register failed",error);
       return Send.error(res,null,"Register failed");
