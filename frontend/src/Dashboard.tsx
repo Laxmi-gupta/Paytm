@@ -71,6 +71,13 @@ export const Dashboard = ():JSX.Element => {
     fetchUserDetails();
   },[]) 
 
+  const latestTxn = [...dummyTransactions]
+    .sort(
+      (a, b) =>
+        new Date(b.startTime).getTime() -
+        new Date(a.startTime).getTime()
+    )[0];
+
   return (
     <div className="px-28 py-8 bg-gray-50 min-h-screen">
       <div>
@@ -124,7 +131,7 @@ export const Dashboard = ():JSX.Element => {
                <div className="bg-blue-600 p-3 rounded-lg w-12 mb-2">
                   < ArrowUpRight size={20} className="text-white"/>
                 </div>
-              ₹2,500
+              Rs. {latestTxn?.amount}
             </div>
             <div className="text-gray-500 text-sm my-2 ">Last Transaction</div>
           </div>
