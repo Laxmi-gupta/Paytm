@@ -3,80 +3,49 @@ import { api } from "./utils/axios";
 import { Link } from "react-router-dom";
 import {ArrowUpRight, CreditCard, Plus, Send, Wallet} from "lucide-react"
 import { TransactionsTable } from "./TransactionsTable";
-import type { txnSchema } from "./types/transHistory.type";
+import type { userSchema } from "./types/transHistory.type";
 
-
-export const dummyTransactions: txnSchema[] = [
-  {
-    id: 1,
-    status: "Success",
-    startTime: "2026-01-05T10:15:00.000Z",
-    amount: 1200,
-    type: "Debit",
-    user: {
-      name: "Rahul Sharma",
-    },
-  },
-  {
-    id: 2,
-    status: "Processing",
-    startTime: "2026-01-05T12:45:00.000Z",
-    amount: 5000,
-    type: "Credit",
-    user: {
-      name: "Ananya Singh",
-    },
-  },
-  {
-    id: 3,
-    status: "Failure",
-    startTime: "2026-01-04T18:30:00.000Z",
-    amount: 800,
-    type: "Debit",
-    user: {
-      name: "Vikas Patel",
-    },
-  },
-  {
-    id: 4,
-    status: "Success",
-    startTime: "2026-01-03T09:20:00.000Z",
-    amount: 2200,
-    type: "Credit",
-    user: {
-      name: "Sneha Mehta",
-    },
-  },
-];
-
-type userSchema = {
-  id: number;
-  name: string;
-  Balance : {
-    amount: number
-  }
-}
+// type userSchema = {   
+//   id: number;
+//   name: string;
+//   Balance : {
+//     amount: number
+//   },
+//   // trsn details
+//   ledgerEntries: {
+//     id: number,
+//     amount: number,
+//     mode: "Credit" | "Debit",
+//     createdAt: string, 
+//   },
+//   sendTransfers: {
+//     status: string,
+//     receiver: {
+//       name: string
+//     }
+//   }
+// }  
 
 export const Dashboard = ():JSX.Element => {
   const [user,setUser] = useState<userSchema | null>(null);
-  // const [txns,setTxns] = useState<txnSchema[] | null>([]);   // this will be fetched form trsn ledger
-  
 
   useEffect(() => {
     const fetchUserDetails = async() => {
       const res = await api.get(`${import.meta.env.VITE_API_URL}/dashboard`)
-      console.log(res.data)
+      console.log(res.data.data)
       setUser(res.data.data)
     }
     fetchUserDetails();
   },[]) 
 
-  const latestTxn = [...dummyTransactions]
+  const latestTxn = [...(user?.transactions || [])]
     .sort(
       (a, b) =>
         new Date(b.startTime).getTime() -
         new Date(a.startTime).getTime()
     )[0];
+
+    console.log("fetched usser",user)
 
   return (
     <div className="px-28 py-8 bg-gray-50 min-h-screen">
@@ -93,7 +62,7 @@ export const Dashboard = ():JSX.Element => {
               </div>
             </div>
             
-            <div className="text-3xl font-bold mb-1 mt-4">Rs. {user?.Balance.amount}</div>
+            <div className="text-3xl font-bold mb-1 mt-4">Rs. {user?.balance}</div>
             <p className="text-sm opacity-80">Indian rupees</p>
           </div>
 
@@ -120,7 +89,7 @@ export const Dashboard = ():JSX.Element => {
                 <div className="bg-blue-600 p-3 rounded-lg w-12 mb-2">
                   <CreditCard size={20} className="text-white" />
                 </div>
-              {user?.Balance.amount.toLocaleString()}
+              {user?.balance.toLocaleString()}
             </div>
             <div className="text-gray-500 text-sm my-2">Total Balance</div>
           </div>
@@ -142,14 +111,14 @@ export const Dashboard = ():JSX.Element => {
                <div className="bg-blue-600 p-3 rounded-lg w-12 mb-2">
                 <CreditCard  className=" text-white" size={20}/>
               </div>
-              {dummyTransactions.length}
+              {user?.transactions.length}
             </div>
             <div className="text-gray-500 text-sm my-2">Total Transactions</div>
           </div>
         </div>
       </div>
 
-      <TransactionsTable transactions={dummyTransactions || []}/>  
+      <TransactionsTable transactions={user?.transactions || []}/>  
       {/* here pass the actual transaction list */}
     </div>
   )

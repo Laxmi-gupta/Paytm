@@ -45,7 +45,7 @@ app.post('/webhooks',async(req,res) => {
 
 app.post('/dbUpdate',OnRamp.databaseUpdate);
 
-app.post('/p2p',p2p.p2pTransfer);
+app.post('/p2p',AuthMiddleware.authenticateUser,p2p.p2pTransfer);
 
 app.get('/transaction/status',AuthMiddleware.authenticateUser,OnRamp.getTransaction)
 

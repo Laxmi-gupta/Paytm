@@ -21,19 +21,27 @@ model User {
   refreshToken String? @unique
   number String @unique
   OnRampTransaction OnRampTransaction[] 
-  Balance Balance?     // 1 user can hv only 1 wallet 
+  Balance Balance?     // 1 user can hv only 1 wallet
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime  @updatedAt       // automatically updates when something is changed
+  ledgerEntries TransactionLedger[]         // Ledger creation must be mandatory and inside the transaction
+  sendTransfers P2PTransfer[] @relation("SendTransfers")    // Give  all transfers this user sent
+  receivedTransfers P2PTransfer[] @relation("ReceivedTransfers") // Give  all transfers this user sent
 }
 
 //adding money from bank   
 model OnRampTransaction { // money deposits => paytm wallet add
   id Int @id @default(autoincrement())
-  status onRampStatus 
+  status onRampStatus @default(Processing)
   startTime DateTime
   amount Int 
   provider String      // bank name
   token String @unique 
   userId Int
   user User @relation(fields: [userId], references: [id])
+
+  ledgerEntries TransactionLedger[]
 }
 
 model Balance {    // wallet
@@ -42,14 +50,42 @@ model Balance {    // wallet
   locked Int   // prevents double spending same money cant be spent twice
   userId Int @unique
   user User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-
-model Merchant {
+model P2PTransfer {
   id Int @id @default(autoincrement())
-  name String?
-  email String @unique
-  auth_type AuthType
+  senderId Int
+  sender User @relation("SendTransfers",fields: [senderId], references: [id])
+  receiverId Int
+  receiver User @relation("ReceivedTransfers",fields: [receiverId], references: [id])
+  amount Int 
+  status P2PStatus @default(Pending)
+
+  idempotencyKey String? @unique  // Database itself blocks duplicates. Even if two requests hit at same time
+
+  ledgerEntries TransactionLedger[]  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TransactionLedger {
+  id Int @id @default(autoincrement())
+  amount Int
+  transactionType TransactionType
+  mode TxnMode
+  createdAt DateTime @default(now())
+
+  userId Int
+  user User @relation(fields: [userId],references: [id])
+
+  p2pTransferLedger Int?
+  p2pTransfer P2PTransfer? @relation(fields: [p2pTransferLedger], references: [id])
+
+  onRampTxLedger Int?
+  onRampTx OnRampTransaction? @relation(fields: [onRampTxLedger], references: [id])
 }
 
 enum onRampStatus {
@@ -58,7 +94,19 @@ enum onRampStatus {
   Processing
 }
 
-enum AuthType {
-  Google
-  Github
+enum P2PStatus {
+  Success
+  Failure
+  Pending
 }
+
+enum TransactionType {
+  Onramp
+  P2P
+}
+
+enum TxnMode {
+  Credit
+  Debit
+}
+
