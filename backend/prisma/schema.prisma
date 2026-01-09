@@ -21,7 +21,7 @@ model User {
   refreshToken String? @unique
   number String @unique
   OnRampTransaction OnRampTransaction[] 
-  Balance Balance?     // 1 user can hv only 1 wallet
+  Balance Balance?     // 1 user can hv only 1 wallet  
 
   createdAt DateTime @default(now())
   updatedAt DateTime  @updatedAt       // automatically updates when something is changed

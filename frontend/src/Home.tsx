@@ -1,33 +1,34 @@
 import type React from "react";
 import { Lock,Building2,Wallet,Send,ArrowLeftRight,Shield} from "lucide-react"
+import { Link } from "react-router-dom";
 
 export const Home: React.FC = () => {
   return (
     <section className="w-full bg-white">
-      <div className="py-16">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="bg-blue-100 rounded-xl min-h-[380px] p-12 relative">
-            <div className="max-w-xl">
-                <h1 className="text-6xl  text-black leading-tight">
-                  Pay <br />
-                  friends. <br />
-                  Pay for <br />
-                  everything.
-                </h1>
+      <div className="py-24">
+        <div className="max-w-4xl mx-auto px-6 text-center space-y-6">
+          {/* <div className="min-h-[380px] p-12"> */}
+            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-500 py-1 px-4 font-medium text-sm mx-auto rounded-full">
+              <Shield size={30}/>
+              <p >Secure Digital Payments</p>
+            </div>
 
-                <p className="mt-6 text-lg text-gray-700">
-                Payment solutions built to work <br/>
-                for your business
-                </p>
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 leading-tight">Simple, Secure <br />
+            <span className="text-blue-600">Digital Wallet</span>
+           </h1>
+           
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">Send, receive, and manage your money with PayX. Fast, reliable, and built with security at its core.</p>
+
+            <div className="flex justify-center gap-4 pt-4">
+              <Link to="/signup" className="px-6 py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-blue-700 transition">Get Started Free</Link>
+              
+              <Link to="/login" className="px-6 py-3 rounded-xl border border-gray-300 text-gray-800 font-semibold hover:bg-gray-100 transition">Login to account</Link>
             </div>
-            
-            <div className="absolute right-[-80px] -translate-y-1/2 top-1/2 md:w-[360px] ">
-              <img src="/gradient.png" alt="" />
-             
-            </div>
-          </div>
-          
-        </div>
+          {/* </div>
+           */}
+        </div>          
+      </div>
+        
       
       {/* middle cards */}
       <div className="py-20 bg-gray-50 text-center">
@@ -36,7 +37,7 @@ export const Home: React.FC = () => {
         <p className="text-gray-500">grade infrastructure.</p>
         <div className="max-w-7xl h- mx-auto px-6 mt-14 grid md:grid-cols-3 gap-10"> 
           {[
-             {
+            {
               icon: <Lock size={22} />,
               title: "JWT Authentication",
               desc: "Secure token-based authentication protecting all your transactions."
@@ -80,7 +81,6 @@ export const Home: React.FC = () => {
         )}
         </div>
       </div>
-    </div>
     </section>
   )
 }
