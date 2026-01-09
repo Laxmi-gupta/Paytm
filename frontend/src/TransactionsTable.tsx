@@ -27,7 +27,7 @@ export const TransactionsTable = ({ transactions }: any) => (
           <div>
             <p className="font-medium">{tx.user.name}</p>
             <p className="text-xs text-gray-500">
-              {new Date(tx.startTime).toLocaleString()}
+              {new Date(tx.createdAt).toLocaleString()}
             </p>
         </div>
       </div>

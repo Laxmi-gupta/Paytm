@@ -1,7 +1,7 @@
 import axios from "axios";
 import type React from "react";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 type Transaction = {
   amount: number;
@@ -111,6 +111,7 @@ export const Success: React.FC = () => {
           </div>
         </div>
 
+        <Link to="/dashboard">Go to Dashboard</Link>
       </div>
     </div>
   );

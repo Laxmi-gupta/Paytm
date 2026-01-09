@@ -10,7 +10,6 @@ interface decodedTok {
 export class AuthMiddleware {
   static authenticateUser = (req:Request,res:Response,next: NextFunction) => {
     try {
-      console.log("cookies",req.cookies);
       const token = req.cookies.accesstoken;
       console.log("authenticate",token)
       if(!token) {
@@ -32,6 +31,7 @@ export class AuthMiddleware {
   static RefreshTokenValidation = (req:Request,res:Response,next:NextFunction) => {
     try {
       const refreshToken = req.cookies.refreshToken;
+      console.log("refresh token",refreshToken)
       if(!refreshToken) {
         return Send.unAuthorized(res, { message: "No refresh token provided" });
       }

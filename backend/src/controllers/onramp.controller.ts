@@ -49,31 +49,50 @@ export class OnRamp {
   static databaseUpdate = async(req:Request,res:Response) => {
     const {userId,amount,token} = req.body;
     console.log("inside dbupadte")
-      try {
-        await prisma.$transaction([
-            prisma.balance.updateMany({
-                where: {
-                    userId: Number(userId)  
-                },
-                data: {
-                    amount: {
-                        // You can also get this from your DB
-                        increment: Number(amount)
-                    }
+    try {
+      const onRampTx = await prisma.onRampTransaction.findUnique({
+        where: { token }
+      });
+
+      if (!onRampTx) {
+        return res.status(404).json({ message: "OnRamp transaction not found" });
+      }
+
+      await prisma.$transaction(async(tx) => {
+        await tx.balance.updateMany({
+            where: {
+                userId: Number(userId)  
+            },
+            data: {
+                amount: {
+                    // You can also get this from your DB
+                    increment: Number(amount)
                 }
-            }),
-            prisma.onRampTransaction.updateMany({
-                where: {
-                    token: token
-                }, 
-                data: {
-                    status: "Success",
-                }
-            })
-        ]);
+            }
+        }),
+
+        await tx.onRampTransaction.updateMany({
+            where: {
+                token: token
+            }, 
+            data: {
+                status: "Success",
+            }
+        })
+
+        // shld create p2p ledger
+        await tx.transactionLedger.create({
+          data: {
+            amount: 100,
+            transactionType: "Onramp",
+            mode: "Credit",
+            userId: userId,
+            onRampTxLedger: onRampTx.id
+          }
+        }),  
         console.log("database updated")
         return res.status(200).json({message:"success"}) // mai pehle idar se bhej rhi thi 
-
+      })
     } catch(e) {
         console.error(e);
         res.status(411).json({

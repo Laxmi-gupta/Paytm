@@ -41,8 +41,8 @@ export const Dashboard = ():JSX.Element => {
   const latestTxn = [...(user?.transactions || [])]
     .sort(
       (a, b) =>
-        new Date(b.startTime).getTime() -
-        new Date(a.startTime).getTime()
+        new Date(b.createdAt).getTime() -
+        new Date(a.createdAt).getTime()
     )[0];
 
     console.log("fetched usser",user)
