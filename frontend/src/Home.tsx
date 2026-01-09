@@ -1,4 +1,5 @@
 import type React from "react";
+import { Lock,Building2,Wallet,Send,ArrowLeftRight,Shield} from "lucide-react"
 
 export const Home: React.FC = () => {
   return (
@@ -28,30 +29,55 @@ export const Home: React.FC = () => {
           
         </div>
       
-      <div className="py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-10">
-
-          <div className="p-8 rounded-xl shadow-md hover:shadow-lg transition">
-            <h3 className="text-xl font-semibold mb-3">Fast Payments</h3>
-            <p className="text-gray-600">
-              Send and receive money instantly with zero friction.
-            </p>
+      {/* middle cards */}
+      <div className="py-20 bg-gray-50 text-center">
+        <h1 className="text-3xl font-bold">Built for Real Transactions</h1>
+        <p className="text-gray-500 mt-3">Everything you need to manage digital payments, backed by enterprise-</p>
+        <p className="text-gray-500">grade infrastructure.</p>
+        <div className="max-w-7xl h- mx-auto px-6 mt-14 grid md:grid-cols-3 gap-10"> 
+          {[
+             {
+              icon: <Lock size={22} />,
+              title: "JWT Authentication",
+              desc: "Secure token-based authentication protecting all your transactions."
+            },
+            {
+              icon: <Building2 size={22} />,
+              title: "Bank Integration",
+              desc: "Connect with our banking partner to fund your wallet seamlessly."
+            },
+            {
+              icon: <Wallet size={22} />,
+              title: "Digital Wallet",
+              desc: "Store your money securely and access it anytime, anywhere."
+            },
+            {
+              icon: <Send size={22} />,
+              title: "P2P Transfers",
+              desc: "Send money to anyone instantly with zero transfer fees."
+            },
+            {
+              icon: <ArrowLeftRight size={22} />,
+              title: "On-Ramp Support",
+              desc: "Add money from your bank account directly to your wallet."
+            },
+            {
+              icon: <Shield size={22} />,
+              title: "Secure & Reliable",
+              desc: "Enterprise-grade security for all your financial operations."
+            }
+          ].map((itm,idx) => (
+            <div key={idx} className="group bg-white p-6 rounded-2xl border border-gray-200  hover:shadow-lg text-left min-h-[140px]">
+              <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center mb-2 text-blue-600 transition-transform duration-300 group-hover:scale-110">
+                {itm.icon}
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{itm.title}</h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+              {itm.desc}
+              </p>
           </div>
-
-          <div className="p-8 rounded-xl shadow-md hover:shadow-lg transition">
-            <h3 className="text-xl font-semibold mb-3">Secure Transfers</h3>
-            <p className="text-gray-600">
-              Industry-grade encryption keeps your money safe.
-            </p>
-          </div>
-
-          <div className="p-8 rounded-xl shadow-md hover:shadow-lg transition">
-            <h3 className="text-xl font-semibold mb-3">Business Ready</h3>
-            <p className="text-gray-600">
-              Built for individuals and growing businesses.
-            </p>
-          </div>
-
+          )
+        )}
         </div>
       </div>
     </div>
