@@ -32,7 +32,7 @@ export const Dashboard = ():JSX.Element => {
   useEffect(() => {
     const fetchUserDetails = async() => {
       const res = await api.get(`${import.meta.env.VITE_API_URL}/dashboard`)
-      console.log(res.data.data)
+      // console.log(res.data.data)
       setUser(res.data.data)
     }
     fetchUserDetails();
@@ -44,8 +44,6 @@ export const Dashboard = ():JSX.Element => {
         new Date(b.createdAt).getTime() -
         new Date(a.createdAt).getTime()
     )[0];
-
-    console.log("fetched usser",user)
 
   return (
     <div className="px-28 py-8 bg-gray-50 min-h-screen">

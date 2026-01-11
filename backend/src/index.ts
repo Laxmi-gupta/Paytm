@@ -27,11 +27,13 @@ app.post('/signup',Auth.register);
 
 app.post('/login',Auth.login);
 
-app.get('/dashboard',AuthMiddleware.authenticateUser,Dashboard.getUser);
-
 app.post('/logout',AuthMiddleware.authenticateUser,Auth.logout);
 
-app.post('/refresh-token',AuthMiddleware.RefreshTokenValidation,Auth.refreshToken);
+app.post('/refresh-token',Auth.refreshToken);
+
+app.get('/dashboard',AuthMiddleware.authenticateUser,Dashboard.getUser);
+
+app.get('/getName',AuthMiddleware.authenticateUser,Dashboard.getUserName);
 
 app.post('/transaction',AuthMiddleware.authenticateUser,OnRamp.createTransaction);
 

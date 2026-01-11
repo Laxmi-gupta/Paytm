@@ -1,6 +1,7 @@
 import type React from "react";
 import { useForm } from "react-hook-form";
 import { api } from "./utils/axios";
+import toast from "react-hot-toast";
 
 export const Transactions: React.FC = () => {
   const {register,handleSubmit,formState:{errors},reset} = useForm();
@@ -8,8 +9,13 @@ export const Transactions: React.FC = () => {
   const onSubmit = async(data:any) => {
     try {
       const res = await api.post('/transaction',data);
-      console.log("frotend calling",res.data.data.paymentUrl);
-      window.location.href = (res.data.data.paymentUrl);
+      console.log("frotend calling",res.data);
+      if(!res.data.ok) {
+        toast.error(res.data.message);
+        return
+      }
+      toast.success(res.data.message);
+      // window.location.href = (res.data.data.paymentUrl);
       reset();
     } catch(error) {
       console.log("Transaction failed",error);

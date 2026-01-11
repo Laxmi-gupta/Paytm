@@ -12,6 +12,8 @@ import { Success } from './Success'
 import {Toaster} from "react-hot-toast"
 import { Dashboard } from './Dashboard'
 
+// add protected routes to prevent url navigation
+
 const router = createBrowserRouter([
   {
     path: '/',

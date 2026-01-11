@@ -182,7 +182,7 @@ app.post('/bank/pay/cancel',(req,res) => {
   const token=req.query.token;
   if(!token || !payment[token]) return res.json({message:"Token invalid"});
   payment[token].status = "failed";
-  return res.status(400).json({data:payment})  // iske wajah se wo 3001 oe h
+  return res.status(400).json({data:payment})
 })
 
 app.listen(3001,() => {

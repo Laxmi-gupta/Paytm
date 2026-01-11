@@ -10,7 +10,7 @@ interface decodedTok {
 export class AuthMiddleware {
   static authenticateUser = (req:Request,res:Response,next: NextFunction) => {
     try {
-      const token = req.cookies.accesstoken;
+      const token = req.cookies.accessToken;
       console.log("authenticate",token)
       if(!token) {
         return Send.unAuthorized(res,null,"Token not exists");
@@ -18,32 +18,11 @@ export class AuthMiddleware {
 
       const decodedToken = jwt.verify(token,authConfig.secret) as decodedTok;
       (req as any).userId = decodedToken.userId;    // cant be decodeed in controller so here string norrmal variabel
-      
+      console.log("req user",(req as any).userId)
       next();   // if not call then it will stuck here only
     } catch(error) {
       console.log("Authenticate user failed",error);
       return Send.unAuthorized(res,null,"Authenticate user");
     } 
   }
-  
-
-  // ye sirf middleware h isse hum cookie mai store nhi kar rahe 
-  static RefreshTokenValidation = (req:Request,res:Response,next:NextFunction) => {
-    try {
-      const refreshToken = req.cookies.refreshToken;
-      console.log("refresh token",refreshToken)
-      if(!refreshToken) {
-        return Send.unAuthorized(res, { message: "No refresh token provided" });
-      }
-
-      // const decodedToken = jwt.verify(token, secret) as string; ❌ bcoz its a object
-      const decodedToken = jwt.verify(refreshToken,authConfig.refresh_secret) as decodedTok;
-      (req as any).userId = decodedToken.userId;
-      next();
-    } catch(error) {
-      console.log("Refresh token validation failed",error);
-      return Send.error(res,null,"Refresh token validation failed");
-    }
-  }
-  
 }

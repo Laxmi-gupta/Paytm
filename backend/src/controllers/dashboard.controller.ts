@@ -5,6 +5,20 @@ import { Send } from "../utils/response.utils.js";
 const prisma = new PrismaClient(); 
 
 export class Dashboard {
+  static getUserName = async(req:Request,res:Response) => {
+    try {
+      const userId = (req as any).userId;
+
+      if(!userId) return Send.unAuthorized(res,null,"Not authorized");
+      const user = await prisma.user.findUnique({where: {id: userId},select: {name:true}});
+
+      return Send.success(res,user?.name);
+    } catch(error) {
+        console.error("Dashboard getName error:", error);
+        return Send.error(res, null, "Internal server error");
+    }
+  }
+
   static getUser = async(req:Request,res:Response) => {
     try {
       const userId = (req as any).userId;
@@ -45,7 +59,6 @@ export class Dashboard {
           }       
         }
       })
-      console.log(user)
 
       if(!user) return Send.error(res,null,"User not found");
 

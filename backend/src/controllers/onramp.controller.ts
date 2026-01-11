@@ -91,7 +91,7 @@ export class OnRamp {
           }
         }),  
         console.log("database updated")
-        return res.status(200).json({message:"success"}) // mai pehle idar se bhej rhi thi 
+        return res.status(200).json({message:"success"}) 
       })
     } catch(e) {
         console.error(e);

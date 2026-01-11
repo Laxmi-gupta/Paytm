@@ -19,6 +19,7 @@ export const  SignUp: React.FC = () => {
   const onSubmit = async(formData:SignupCred) => {
     try {
       const res = await api.post('/signup',formData);
+      console.log(res.data)
       if(!res?.data.ok) {
         toast.error(res.data.message);
         return;

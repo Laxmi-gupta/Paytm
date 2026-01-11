@@ -10,9 +10,17 @@ import { generateToken } from "../utils/jwtToken.js"
 
 const prisma = new PrismaClient();
 
+interface decodedTok {
+  userId: string
+}
+
 export class Auth {
   static login = async (req:Request,res:Response) => {
     try {
+      // deletes the prev user session
+      res.clearCookie("accessToken");
+      res.clearCookie("refreshToken");
+
       const validated = authSchema.login.safeParse(req.body);
       console.log("login backedn route",validated);
       if(!validated.success) return Send.error(res,null,"Invalid input");
@@ -60,6 +68,10 @@ export class Auth {
 
   static register = async (req:Request,res:Response) => {
     try {
+      // deletes the prev user session
+      res.clearCookie("accessToken");
+      res.clearCookie("refreshToken");
+
       console.log(req.body);
       const validated = authSchema.register.safeParse(req.body);
       
@@ -90,7 +102,7 @@ export class Auth {
       });
 
      const {accessToken,refreshToken} = generateToken({id: user.id});    
-     console.log("user token",user.id) 
+     console.log("user token",user) 
 
      await prisma.user.update({where: {id: user.id},data:{refreshToken}});
 
@@ -141,8 +153,19 @@ export class Auth {
 
   static refreshToken = async(req:Request,res:Response) => {
     try{
+      const refreshToken = req.cookies.refreshToken;
+      console.log("refresh token",refreshToken)
+      if(!refreshToken) {
+        return Send.unAuthorized(res, { message: "No refresh token provided" });
+      }
+
+      // const decodedToken = jwt.verify(token, secret) as string; bcoz its a object
+      const decodedToken = jwt.verify(refreshToken,authConfig.refresh_secret) as decodedTok;
+      if(!decodedToken) return Send.unAuthorized(res,null,"Unauthorized user");
+
       // if i want accestoken new the refrsh token shld be valid and +nt in db
-      const userId = (req as any).userId;
+      const userId = Number(decodedToken.userId);
+      if(!userId) return Send.unAuthorized(res,null,"Unauthorized user");
       const refreshTokenCookie = req.cookies.refreshToken;
       const user = await prisma.user.findUnique({where: {id: userId}});
       if(!user) {
@@ -158,7 +181,7 @@ export class Auth {
       }
 
       const newAccessToken =jwt.sign({userId:user.id},authConfig.secret,{expiresIn:authConfig.secret_expires as any});
-      res.cookie("accesstoken",newAccessToken,{
+      res.cookie("accessToken",newAccessToken,{
         httpOnly:true,
         maxAge: 15*60*1000,
         sameSite:"strict",
