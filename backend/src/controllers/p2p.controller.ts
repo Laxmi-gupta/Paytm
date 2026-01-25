@@ -1,7 +1,9 @@
 import type { Request,Response } from "express"
 import {z} from "zod"
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, TransactionStatus } from "@prisma/client";
 import { Send } from "../utils/response.utils.js";
+import { evaluateP2pIntent } from "../utils/p2p/p2pDecision.js";
+import { p2pDetails } from "../utils/p2p/p2pIndicators.js";
 
 const prisma = new PrismaClient();
 
@@ -29,8 +31,6 @@ export class p2p {
           include: {Balance:true}
         })
 
-        console.log("sender",sender);
-
         if(!sender) throw new Error("Sender not found");
 
         if(!sender.Balance) throw new Error("No wallet");
@@ -41,17 +41,55 @@ export class p2p {
           }
         });
 
-        console.log("receiver",receiver)
-
         if(!receiver) {
           console.log("not user")
           throw new Error("Receiver not exists")
         } 
 
         const userAmount = sender.Balance.amount;
-        if(userAmount < amount) throw new Error("Balance not sufficient");
+        // if(userAmount < amount) throw new Error("Balance not sufficient");
 
         if(sender.id === receiver.id) throw new Error("Cannot send money to yourself");
+
+        // p2p trsn intent
+        const intent = await tx.transactionIntent.create({
+          data: {
+            amount,
+            status: TransactionStatus.Pending,
+            senderId:sender.id,
+            receiverId: receiver.id,
+            createdAt: new Date(),
+            type: "P2P",
+          }
+        })
+
+        console.log("p2p trsn intent",intent)
+
+        // finds the total trsn cnt in 10min and avg amt for decision engine
+        const {txnCountLast10Min,avgAmt} = await p2pDetails(senderId);
+
+        // decison is taken with decison engine
+        const decison = await evaluateP2pIntent({senderBal: userAmount,amount: intent.amount,txnCountLast10Min,avgAmt});
+        console.log(decison);
+
+        // if approved continue p2p trsnx
+        const updated_intent = await tx.transactionIntent.update({
+          where: {id:intent.id},
+          data: {
+            status: decison.status,
+            riskLevel:decison.riskLevel,
+            decisionReason:decison.reason as string,
+            decidedAt: new Date()          
+          }
+        })
+
+        console.log("updated intwwn",updated_intent);
+
+        // if high risk then block but for mdeium risk it shld be verified through otp
+        if(updated_intent.status!==TransactionStatus.Approved) {
+          console.log("blocked");
+          return res.status(400).json({message:`Transaction ${updated_intent.status}: ${updated_intent.decisionReason}`})
+        }
 
       // p2p transfer create
         const p2pCreation = await tx.p2PTransfer.create({
@@ -59,7 +97,8 @@ export class p2p {
             senderId:sender.id,
             receiverId:receiver.id,
             amount,
-            status: "Pending",           
+            status: "Pending",   
+            intentId: intent.id        
           }
         })
         console.log("trsn stared",p2pCreation);
@@ -122,7 +161,7 @@ export class p2p {
         console.log("updated",updation)
       })
 
-      return res.status(200).json({message:"Transferred succesfully"})
+      // return res.status(200).json({message:"Transferred succesfully"})
     } catch(error: any) {
       console.error("P2p error",error.message);
 

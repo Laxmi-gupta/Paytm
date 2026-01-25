@@ -15,7 +15,7 @@ export const Transactions: React.FC = () => {
         return
       }
       toast.success(res.data.message);
-      // window.location.href = (res.data.data.paymentUrl);
+      window.location.href = (res.data.data.paymentUrl);
       reset();
     } catch(error) {
       console.log("Transaction failed",error);

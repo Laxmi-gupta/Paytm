@@ -26,8 +26,12 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime  @updatedAt       // automatically updates when something is changed
   ledgerEntries TransactionLedger[]         // Ledger creation must be mandatory and inside the transaction
+
   sendTransfers P2PTransfer[] @relation("SendTransfers")    // Give  all transfers this user sent
   receivedTransfers P2PTransfer[] @relation("ReceivedTransfers") // Give  all transfers this user sent
+
+  sendIntent TransactionIntent[] @relation("sentIntent")
+  receiverIntent TransactionIntent[] @relation("receiverIntent")
 }
 
 //adding money from bank   
@@ -42,6 +46,9 @@ model OnRampTransaction { // money deposits => paytm wallet add
   user User @relation(fields: [userId], references: [id])
 
   ledgerEntries TransactionLedger[]
+
+  intentId Int @unique
+  intent TransactionIntent @relation(fields: [intentId], references: [id])
 }
 
 model Balance {    // wallet
@@ -69,6 +76,9 @@ model P2PTransfer {
   ledgerEntries TransactionLedger[]  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  intentId Int @unique
+  intent TransactionIntent @relation(fields: [intentId], references: [id])
 }
 
 model TransactionLedger {
@@ -86,6 +96,31 @@ model TransactionLedger {
 
   onRampTxLedger Int?
   onRampTx OnRampTransaction? @relation(fields: [onRampTxLedger], references: [id])
+}
+
+// decisoin engine
+model TransactionIntent {
+  id Int @id @default(autoincrement())
+  senderId Int?        // optional for OnRamp
+  receiverId Int
+  status TransactionStatus
+  amount Int
+
+  // Decision metadata (nullable until evaluated)
+  riskLevel RiskLevel?
+  decisionReason String?
+  decidedAt DateTime?
+
+  sender User? @relation("sentIntent",fields: [senderId],references: [id])
+  receiver User @relation("receiverIntent",fields: [receiverId],references: [id])
+
+  createdAt DateTime @default(now())
+  executedAt DateTime?
+
+  type IntentType       // to differentiate onramp or p2p
+
+  onrampTxn OnRampTransaction?
+  p2pTxn P2PTransfer?
 }
 
 enum onRampStatus {
@@ -110,3 +145,21 @@ enum TxnMode {
   Debit
 }
 
+enum TransactionStatus {
+  Pending
+  Approved
+  Blocked
+  Executed
+  Failed
+}
+
+enum IntentType {
+  Onramp
+  P2P
+}
+
+enum RiskLevel {
+  Low
+  Medium
+  High
+}

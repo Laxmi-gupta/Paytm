@@ -16,6 +16,17 @@ export class OnRamp {
       
       const {amount,provider} = validated.data;
       if(amount<=0) return Send.error(res,"Invalid amount");
+
+      // only done for removing intent eror
+      const intent = await prisma.transactionIntent.create({
+        data: {
+          receiverId: Number(userId),
+          amount,
+          riskLevel: "Low",
+          status: "Pending",
+          type:"Onramp"
+        }
+      })
       
       const response = await axios.post("http://localhost:3001/bank/make-payment",{
         userId,amount,provider
@@ -28,7 +39,8 @@ export class OnRamp {
           provider,
           token: response.data.token, 
           userId,
-          status: "Processing"
+          status: "Processing",
+          intentId: intent.id
         }
       })
       console.log("ramo created",ramp)
@@ -48,7 +60,7 @@ export class OnRamp {
 
   static databaseUpdate = async(req:Request,res:Response) => {
     const {userId,amount,token} = req.body;
-    console.log("inside dbupadte")
+    console.log("inside dbupadte",amount)
     try {
       const onRampTx = await prisma.onRampTransaction.findUnique({
         where: { token }
@@ -83,7 +95,7 @@ export class OnRamp {
         // shld create p2p ledger
         await tx.transactionLedger.create({
           data: {
-            amount: 100,
+            amount,
             transactionType: "Onramp",
             mode: "Credit",
             userId: userId,

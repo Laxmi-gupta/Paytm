@@ -61,7 +61,7 @@ export class Dashboard {
       })
 
       if(!user) return Send.error(res,null,"User not found");
-
+      console.log("users",user)
       const transactions = user.ledgerEntries.map((le) => {
         let displayName: string = "Bank Wallet "; if(le.onRampTx) displayName += le.onRampTx?.provider;   // for onramp ledger
 
