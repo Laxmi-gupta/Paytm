@@ -35,7 +35,8 @@ const router = createBrowserRouter([
   {
     path: '/login',
     element: <Login />
-  },{
+  },
+  {
     path: '/success-payment',
     element: <Success />
   }
@@ -43,7 +44,7 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Toaster position='top-center' toastOptions={{duration:3000}}/>
+    <Toaster position='top-right' toastOptions={{duration:3000}}/>
     <RouterProvider router={router}  />
   </StrictMode>,
 )

@@ -4,7 +4,7 @@ type p2pIntent = {
   senderBal:number,
   amount:number,
 
-  txnCountLast10Min:number,
+  txnCountLast5Min:number,
   avgAmt:number
 }
 
@@ -17,7 +17,7 @@ type p2pIntentResult =  {
 
 export async function evaluateP2pIntent(input: p2pIntent): Promise<p2pIntentResult> {
   // decison making
-  const { senderBal, amount, txnCountLast10Min, avgAmt } = input;
+  const { senderBal, amount, txnCountLast5Min, avgAmt } = input;
 
   // 1. amount > wallet amt
   if(senderBal<amount) {
@@ -29,9 +29,9 @@ export async function evaluateP2pIntent(input: p2pIntent): Promise<p2pIntentResu
     return {status:TransactionStatus.Pending,reason:"LOW_AMOUNT_PROBING",riskLevel:RiskLevel.Medium}
   }
 
-  // 4. if trscn done more than 5 times within 10min
-  if(txnCountLast10Min) {
-    return {status:TransactionStatus.Pending,reason: "HIGH_TXN_VELOCITY",riskLevel:RiskLevel.High}
+  // 4. if trscn done more than 5 times within 5min
+  if(txnCountLast5Min) {
+    return {status:TransactionStatus.Blocked,reason: "HIGH_TXN_VELOCITY",riskLevel:RiskLevel.High}
   }
 
   // 5. if txn amt is 3 times more than avg

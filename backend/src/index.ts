@@ -49,6 +49,8 @@ app.post('/dbUpdate',OnRamp.databaseUpdate);
 
 app.post('/p2p',AuthMiddleware.authenticateUser,p2p.p2pTransfer);
 
+app.post('/p2p/verify-otp',AuthMiddleware.authenticateUser,p2p.p2pVerify);
+
 app.get('/transaction/status',AuthMiddleware.authenticateUser,OnRamp.getTransaction)
 
 app.listen(appConfig.port,() => {

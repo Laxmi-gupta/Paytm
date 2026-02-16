@@ -3,13 +3,13 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export const p2pDetails = async(senderId:number) => {
-  const txnCountLast10Min = await prisma.transactionIntent.count({
+  const txnCountLast5Min = await prisma.transactionIntent.count({
     where: {
       senderId,
       type: "P2P",
       createdAt: {
-        // “Fetch all transaction intents that were created in the last 10 minutes
-        gte: new Date(Date.now() - 10*60*60) 
+        // “Fetch all transaction intents that were created in the last 5 minutes
+        gte: new Date(Date.now() - 5*60*60) 
       } 
     },
   })
@@ -20,5 +20,5 @@ export const p2pDetails = async(senderId:number) => {
   })
 
   const avgAmt = avgTxnAmt._avg.amount ?? 0;
-  return {txnCountLast10Min,avgAmt};
+  return {txnCountLast5Min,avgAmt};
 }

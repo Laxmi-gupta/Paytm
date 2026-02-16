@@ -46,7 +46,7 @@ export const Dashboard = ():JSX.Element => {
     )[0];
 
   return (
-    <div className="px-28 py-8 bg-gray-50 min-h-screen">
+    <div className="px-40 py-8 bg-gray-50 min-h-screen">
       <div>
         <h1 className="text-3xl font-semibold mb-1">Hello, {user?.name}</h1>
         <p className="text-gray-500 mb-8">Welcom back to PayX</p>

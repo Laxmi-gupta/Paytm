@@ -46,9 +46,6 @@ model OnRampTransaction { // money deposits => paytm wallet add
   user User @relation(fields: [userId], references: [id])
 
   ledgerEntries TransactionLedger[]
-
-  intentId Int @unique
-  intent TransactionIntent @relation(fields: [intentId], references: [id])
 }
 
 model Balance {    // wallet
@@ -101,7 +98,7 @@ model TransactionLedger {
 // decisoin engine
 model TransactionIntent {
   id Int @id @default(autoincrement())
-  senderId Int?        // optional for OnRamp
+  senderId Int       // optional for OnRamp
   receiverId Int
   status TransactionStatus
   amount Int
@@ -111,7 +108,7 @@ model TransactionIntent {
   decisionReason String?
   decidedAt DateTime?
 
-  sender User? @relation("sentIntent",fields: [senderId],references: [id])
+  sender User @relation("sentIntent",fields: [senderId],references: [id])
   receiver User @relation("receiverIntent",fields: [receiverId],references: [id])
 
   createdAt DateTime @default(now())
@@ -119,8 +116,20 @@ model TransactionIntent {
 
   type IntentType       // to differentiate onramp or p2p
 
-  onrampTxn OnRampTransaction?
   p2pTxn P2PTransfer?
+  otp TransactionOtp?
+}
+
+// mdeium risk otp verification 
+model TransactionOtp {
+  id String @id @default(uuid())         // for security purpose it kept as string
+  otpHash String 
+  intentId Int @unique     // → one OTP per intent
+  transactionIntent TransactionIntent @relation(fields: [intentId],references: [id])
+  createdAt DateTime @default(now())
+  expiredAt DateTime 
+  attempts Int @default(0)
+  verifiedAt DateTime?
 }
 
 enum onRampStatus {
