@@ -5,24 +5,15 @@ const URL = import.meta.env.VITE_API_URL;
 console.log(URL)
 
 export const saveUser = async(formData: signUpSchema) => {
-  try {
-    const res = await axios.post(`${URL}/signup`, formData, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    return res;
-  } catch (error) {
-    console.log("signup service",error);
-  }
+  const res = await axios.post(`${URL}/signup`, formData, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  return res;
 }
 
 export const logInUser = async(formData:loginSchema) => {
-  console.log(formData)
-  try {
-    const res = await axios.post(`${URL}/login`,formData,{ withCredentials: true });
-    return res.data;
-  } catch (error) {
-    console.log("login service",error);
-  }
+  const res = await axios.post(`${URL}/login`,formData,{ withCredentials: true });
+  return res.data;
 }

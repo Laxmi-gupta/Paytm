@@ -8,6 +8,10 @@ import cors from "cors";
 import { p2p } from "./controllers/p2p.controller.js";
 import axios from "axios";
 import { Dashboard } from "./controllers/dashboard.controller.js";
+import { Webhook } from "./controllers/webhook.controller.js";
+import AuthRoutes from "./routes/auth.routes.js";
+import OnRampRoutes from "./routes/onramp.routes.js";
+import P2pRoutes from "./routes/p2p.routes.js";
 
 const app = express();
 
@@ -23,35 +27,18 @@ app.get('/',(req,res) => {
   res.send("root route")
 })
 
-app.post('/signup',Auth.register);
-
-app.post('/login',Auth.login);
-
-app.post('/logout',AuthMiddleware.authenticateUser,Auth.logout);
-
-app.post('/refresh-token',Auth.refreshToken);
+app.use(AuthRoutes);
 
 app.get('/dashboard',AuthMiddleware.authenticateUser,Dashboard.getUser);
 
 app.get('/getName',AuthMiddleware.authenticateUser,Dashboard.getUserName);
 
-app.post('/transaction',AuthMiddleware.authenticateUser,OnRamp.createTransaction);
+app.post('/webhooks',Webhook.webhookHandler)
 
-app.post('/webhooks',async(req,res) => {
-  const {userId, amount, token}:any = req.body;  
-  console.log("inside webhooko ")
-  await axios.post('http://localhost:3000/dbUpdate',{userId, amount, token});
-  console.log("database updated")
-  return res.status(200).json({message:"db updated"})
-})
+app.use(P2pRoutes);
 
-app.post('/dbUpdate',OnRamp.databaseUpdate);
+app.use(OnRampRoutes);
 
-app.post('/p2p',AuthMiddleware.authenticateUser,p2p.p2pTransfer);
-
-app.post('/p2p/verify-otp',AuthMiddleware.authenticateUser,p2p.p2pVerify);
-
-app.get('/transaction/status',AuthMiddleware.authenticateUser,OnRamp.getTransaction)
 
 app.listen(appConfig.port,() => {
   console.log(`listening at port ${appConfig.port}`)

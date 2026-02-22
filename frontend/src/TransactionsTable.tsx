@@ -1,11 +1,13 @@
 import { ArrowUpRight, ArrowDownLeft } from "lucide-react";
 import type { txnSchema } from "./types/transHistory.type";
 
+interface Props {
+  transactions: txnSchema[];
+}
 
-
-export const TransactionsTable = ({ transactions }: any) => (
+export const TransactionsTable = ({ transactions }: Props) => (
   <>
-  <h3 className="font-semibold p-4">Recent Transactions</h3>
+  {transactions.length > 0  && (<h3 className="font-semibold text-lg mb-4 mt-8">Recent Transactions</h3> )}
   {transactions.map((tx: txnSchema) => (
     <div
       key={tx.id}

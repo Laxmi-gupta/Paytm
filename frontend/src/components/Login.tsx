@@ -3,19 +3,26 @@ import {useForm} from "react-hook-form";
 import type { loginSchema } from "../types/auth.types";
 import { Link, useNavigate } from "react-router-dom";
 import { logInUser } from "../services/authService";
+import toast from "react-hot-toast";
 
 export const Login: React.FC = () => {
-  const {register,handleSubmit,formState: {errors}} = useForm<loginSchema>();
+  const {register,handleSubmit,formState: {errors,isSubmitting}} = useForm<loginSchema>();
 
   const navigate = useNavigate();
 
   const onSubmit = async(data:loginSchema) => {
     try {
-    const res = await logInUser(data);
-    console.log(res.data);
-    navigate('/dashboard');
-    } catch(ex) {
-      console.error("signup eror",ex);
+      const res = await logInUser(data);
+      if(!res.success) {
+        toast.error(res.message);
+        return;
+      }
+
+      toast.success(res.message);
+      navigate('/dashboard');
+    } catch(error:any) {
+      const message =error.response?.data?.message ||"Login failed. Please try again.";
+      toast.error(message);
     }
   }
 
@@ -67,8 +74,9 @@ export const Login: React.FC = () => {
            <button
               type="submit"
               className="w-full bg-blue-500 text-white py-3 rounded-full mt-4 hover:bg-blue-600 transition"
+              disabled={isSubmitting}
             >
-              LOG IN
+              {isSubmitting ? "Loging in...." : "Login"}
             </button>
 
             <p className="text-center text-sm mt-2 text-gray-500">

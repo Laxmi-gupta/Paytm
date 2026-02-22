@@ -46,25 +46,25 @@ export const P2P:React.FC = () => {
 
        if(res.riskLevel==="Medium") {
         setIntentId(res.intentId);
-        toast.success("Needs verification")
+        toast.success("Otp send to your registered email");
         SetOtpBox(true);
         return;
       }
 
       if(res.riskLevel==="Low") {
-        toast.success("Payment successful")
+        navigate(`/success-p2p?intentId=${res.intentId}`); // pass intwntid also
         reset();
       }
 
-    } catch(err:unknown) {
+    } catch(err:any) {
       console.error("error in p2p transfer",err);
-      toast.error(err?.message)
+      toast.error(err?.response?.data?.message || "Transfer failed");
     }
   }
   
   useEffect(() => {
     const fetchUserDetails = async() => {
-      const res = await api.get(`${import.meta.env.VITE_API_URL}/dashboard`)
+      const res = await api.get(`/dashboard`)
       setUser(res.data.data)
     }
     fetchUserDetails();
@@ -72,15 +72,18 @@ export const P2P:React.FC = () => {
 
   const verifyOtp = async(otp:string) => {
     if(!intentId) return; 
+    if (otp.length !== 6) {
+      toast.error("Enter valid 6 digit OTP");
+      return;
+    }
     try {
       const payload = {
         otp,
         intentId
       }
       const res = await verifyOtpService(payload);
-      console.log("res",res);
       if(res.success) {
-        toast.success("Payment successful");
+        navigate(`/success-p2p?intentId=${res.intentId}`); // pass intwntid also
         reset();
         SetOtpBox(false);
       }
@@ -125,10 +128,7 @@ export const P2P:React.FC = () => {
                   <input 
                     className="mt-1 w-full rounded-lg border border-gray-200 px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
                     type="text"
-                    {...register("number",{required:"Phone no is required",pattern: {
-                        value: /^[6-9]\d{9}$/,
-                        message: "Enter valid 10-digit mobile number",
-                      },})} 
+                    {...register("number")} 
                       placeholder="eg. 9135454660"
                   />
                   {errors.number && <p className="text-red-500">{errors.number.message as string}</p>}

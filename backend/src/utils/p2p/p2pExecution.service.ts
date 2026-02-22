@@ -2,11 +2,9 @@ export const executep2p = async(tx:any,intent:any) => {
   const senderBal = await tx.balance.findUnique({
     where:{userId:intent.senderId}
   })
-  console.log("sender bal",senderBal);
   const receiverBal = await tx.balance.findUnique({
     where: {userId : intent.receiverId}
   })
-  console.log("rec bal",receiverBal);
   if(!senderBal || !receiverBal) throw new Error("Wallet is missing");
 
   if(senderBal.amount < intent.amount) throw new Error("Insufficient balance")
@@ -20,7 +18,6 @@ export const executep2p = async(tx:any,intent:any) => {
       intentId: intent.id        
     }
   })
-  console.log("trsn stared",p2pCreation);
       
   const debit = await tx.balance.update({
     where: {userId: intent.senderId},
@@ -30,8 +27,6 @@ export const executep2p = async(tx:any,intent:any) => {
     }
   })
 
-  console.log("debit",debit)
-
   // receiver increase money
   const credit = await tx.balance.update({
     where: {userId:intent.receiverId},
@@ -40,16 +35,12 @@ export const executep2p = async(tx:any,intent:any) => {
     }
   })
 
-  console.log("credit",credit)
-
   await tx.balance.update({
     where: {userId: intent.senderId},
     data: {
       locked: {decrement: intent.amount}
     }
   })
-
-  console.log("locked oeny restored");
 
   // ledger cretd
   const ledger = await tx.transactionLedger.createMany
@@ -71,7 +62,6 @@ export const executep2p = async(tx:any,intent:any) => {
       }
     ]
   })
-  console.log("ledger",ledger);
 
   // update p2p status
   await tx.p2PTransfer.update({

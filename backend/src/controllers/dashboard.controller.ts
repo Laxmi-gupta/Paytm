@@ -22,7 +22,6 @@ export class Dashboard {
   static getUser = async(req:Request,res:Response) => {
     try {
       const userId = (req as any).userId;
-      console.log("user id for dashboard",userId)
 
       if(!userId) return Send.unAuthorized(res,null,"User is not authorized");
 
@@ -61,7 +60,7 @@ export class Dashboard {
       })
 
       if(!user) return Send.error(res,null,"User not found");
-      console.log("users",user)
+      
       const transactions = user.ledgerEntries.map((le) => {
         let displayName: string = "Bank Wallet "; if(le.onRampTx) displayName += le.onRampTx?.provider;   // for onramp ledger
 
@@ -83,7 +82,7 @@ export class Dashboard {
        return Send.success(res, {
         id: user.id,
         name: user.name,
-        balance: user.Balance?.amount,
+        balance: user.Balance?.amount ?? 0,
         transactions
       }, "Dashboard data fetched");
 

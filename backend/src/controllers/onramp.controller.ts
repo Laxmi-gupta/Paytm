@@ -10,31 +10,20 @@ export class OnRamp {
   static createTransaction = async(req:Request,res:Response) => {
     try {
       const userId = (req as any).userId; 
-      console.log("transac",userId);
+      if (!userId) return Send.error(res,null, "Unauthorized");
       const validated = onRampSchema.createTrans.safeParse(req.body);
       if(!validated.success) return Send.error(res,"Invalid input");
       
       const {amount,provider} = validated.data;
       if(amount<=0) return Send.error(res,"Invalid amount");
 
-      // only done for removing intent eror
-      // const intent = await prisma.transactionIntent.create({
-      //   data: {
-      //     receiverId: Number(userId),
-      //     amount,
-      //     riskLevel: "Low",
-      //     status: "Pending",
-      //     type:"Onramp"
-      //   }
-      // })
-      
       const response = await axios.post("http://localhost:3001/bank/make-payment",{
         userId,amount,provider
       })
       //console.log(response.data);  
       const ramp = await prisma.onRampTransaction.create({
         data: {
-          startTime: new Date(new Date().getTime() + (5.5 * 60 * 60 * 1000)),
+          startTime: new Date(),
           amount,
           provider,
           token: response.data.token, 
@@ -42,8 +31,6 @@ export class OnRamp {
           status: "Processing"
         }
       })
-      console.log("ramo created",ramp)
-      
 
       return Send.success(res,{
         amount,
@@ -57,70 +44,16 @@ export class OnRamp {
     }
   }
 
-  static databaseUpdate = async(req:Request,res:Response) => {
-    const {userId,amount,token} = req.body;
-    console.log("inside dbupadte",amount)
-    try {
-      const onRampTx = await prisma.onRampTransaction.findUnique({
-        where: { token }
-      });
-
-      if (!onRampTx) {
-        return res.status(404).json({ message: "OnRamp transaction not found" });
-      }
-
-      await prisma.$transaction(async(tx) => {
-        await tx.balance.updateMany({
-            where: {
-                userId: Number(userId)  
-            },
-            data: {
-                amount: {
-                    // You can also get this from your DB
-                    increment: Number(amount)
-                }
-            }
-        }),
-
-        await tx.onRampTransaction.updateMany({
-            where: {
-                token: token
-            }, 
-            data: {
-                status: "Success",
-            }
-        })
-
-        // shld create p2p ledger
-        await tx.transactionLedger.create({
-          data: {
-            amount,
-            transactionType: "Onramp",
-            mode: "Credit",
-            userId: userId,
-            onRampTxLedger: onRampTx.id
-          }
-        }),  
-        console.log("database updated")
-        return res.status(200).json({message:"success"}) 
-      })
-    } catch(e) {
-        console.error(e);
-        res.status(411).json({
-            message: "Error while processing webhook"
-        })
-    }
-  }
-
   static getTransaction = async(req:Request,res:Response) => {
     try {
       const token = req.query.token as string;
-      console.log(token); // we shld check both token and userId bcoz whose token is it we get to know but whether its authorized or not it shld be checked
-      if(!token) return Send.error(res,"Token missing");
+      const userId = (req as any).userId;
+      if (!userId) return Send.error(res,null, "Unauthorized");
+      if(!token) return Send.error(res,null,"Token missing");
 
       const onrampData = await prisma.onRampTransaction.findUnique(
         {
-          where:{token},
+          where:{token,userId},
           select:{amount:true,provider:true,startTime:true,status:true}
         });
 
@@ -134,6 +67,5 @@ export class OnRamp {
       return Send.error(res,"get Transaction failed");
     }
     
-
   }
 }

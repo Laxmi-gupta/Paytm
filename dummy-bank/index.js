@@ -7,7 +7,6 @@ app.use(express.json());   // if we need access req.body we need to convert it i
 app.use(express.urlencoded({ extended: true }));
 
 const payment = {};
-// ye bank ka
 app.post('/bank/make-payment',async(req,res) => {
   const {userId, amount,provider} = req.body;     
   if(!userId || !amount || !provider) {
@@ -15,11 +14,10 @@ app.post('/bank/make-payment',async(req,res) => {
   }
 
   const token = crypto.randomBytes(32).toString('hex');
-  // bhot sare payemnts ho sakte h na like 50 ,100 ek baar mai to har payemnt ka alag token mai store hoga
   payment[token] = {
     userId,amount,provider,status:"pending"
   } 
-  res.json({token,paymentUrl: `http://localhost:3001/bank/pay?token=${token}`})  // to bank ke page mai bank ke url ko call karu
+  res.json({token,paymentUrl: `http://localhost:3001/bank/pay?token=${token}`}) 
 
 });
 
@@ -34,13 +32,15 @@ app.get('/bank/pay',(req,res) => {
    <html>
       <head>
         <style>
-          body {
-            display:flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: #f2f4f7
-          }
+            body {
+              margin: 0;
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 100vh;
+              background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+            }
 
             .container {
               width: 380px;
@@ -51,75 +51,73 @@ app.get('/bank/pay',(req,res) => {
               text-align: center;
             }
 
-          .bank{
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #1e40af;
-          }
+            .bank{
+              font-size: 22px;
+              font-weight: bold;
+              margin-bottom: 5px;
+              color: #1e40af;
+            }
 
-          .amount-box {
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-          }
+            .amount-box {
+              background: #f8fafc;
+              padding: 15px;
+              border-radius: 8px;
+              margin-bottom: 20px;
+              border: 1px solid #e2e8f0;
+            }
 
-          .amount {
-            font-size: 26px;
-            font-weight: bold;
-            margin: 20px 0;
-            color: #111;
-          }
+            .amount-box p {
+              margin: 0;
+              color: #64748b;
+              font-size: 14px;
+            }
 
-           button {
-            width: 100%;
-            padding: 14px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            margin-top: 10px;
-            display: inline;
-          }
+            .amount {
+              font-size: 26px;
+              font-weight: bold;
+              margin-top: 10px;
+              color: #111;
+            }
 
-          .pay-btn {
-           width: 100%;
-            padding: 10px 14px;
-            border-radius: 8px;
-            border: none;
-            background: #0f172a;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-          }
-          
+            button {
+              width: 100%;
+              padding: 14px;
+              border-radius: 8px;
+              font-size: 16px;
+              font-weight: 600;
+              border: none;
+              cursor: pointer;
+              margin-top: 10px;
+              transition: all 0.2s ease;
+            }
+                      
+            .btn-row {
+              display: flex;
+              gap: 15px;
+            }
 
-          .pay-btn:hover {
-            background: #15803d;
-          }
+            .btn-row form {
+              flex: 1;
+            }
+
+            .pay-btn {
+              background: #15803d;
+              color: white;
+              border: none;
+            }
+
+            .pay-btn:hover {
+              background: #1e40af;
+            }
 
           .cancel-btn {
-            width: 100%;
-            padding: 10px 14px;
-            border-radius: 8px;
-            border: 1px solid #d1d5db;
             background: white;
-            color: #111827;
-            font-weight: 600;
-            cursor: pointer;
+            border: 1px solid #d1d5db;
+            color: #374151;
           }
 
-          .btn-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            margin-top: 20px;
-          }
-
-          .btn-row form {
-            flex: 1;
+          .cancel-btn:hover {
+            background: #f3f4f6;
           }
 
           .footer {
@@ -134,14 +132,15 @@ app.get('/bank/pay',(req,res) => {
           <div class="bank">${payment[token].provider}</div>
 
           <div class="amount-box">
-            <div>You are paying</div>
+            <p><b>User id: ${payment[token].userId}</b></p>
+            <p>You are paying</p>
             <div class="amount">Amount: ₹ ${payment[token].amount}</div>
           </div>
 
           <div class="btn-row">
             <form method="POST" action="/bank/pay/complete?token=${token}">
                 <button type="submit" class="pay-btn" >
-                    Complete Payment
+                    Approve Payment
                 </button>
             </form>
 
@@ -161,15 +160,12 @@ app.get('/bank/pay',(req,res) => {
 })
 
 app.post('/bank/pay/complete',async(req,res) => {
-
   try {
     const token = req.query.token;
-    console.log("bank toke",token)
     if(!token || !payment[token]) return res.json({message:"Token invalid"});
     const {userId,amount} = payment[token];
     payment[token].status="success";
-    console.log("calling webhooko")
-    const webhook  = await axios.post('http://localhost:3000/webhooks',{token,userId,amount});
+    const webhook  = await axios.post('http://localhost:3000/webhooks',{token,userId,amount,status:"Success"});
     // console.log("webhook",webhook); 
     res.redirect(`http://localhost:5173/success-payment?token=${token}`);
   } catch(error) {
@@ -178,11 +174,20 @@ app.post('/bank/pay/complete',async(req,res) => {
   }
 })
 
-app.post('/bank/pay/cancel',(req,res) => {
-  const token=req.query.token;
-  if(!token || !payment[token]) return res.json({message:"Token invalid"});
-  payment[token].status = "failed";
-  return res.status(400).json({data:payment})
+app.post('/bank/pay/cancel',async(req,res) => {
+  try {
+    const token=req.query.token;
+    if(!token || !payment[token]) return res.json({message:"Token invalid"});
+    const {userId,amount} = payment[token];
+    payment[token].status = "failed";
+    await axios.post('http://localhost:3000/webhooks',{token,userId,amount,status:"Failed"});
+    return res.redirect(
+      `http://localhost:5173/payment-failed?token=${token}`
+    );
+  } catch(err) {
+     console.error("Payment cancellatoin failed",err);
+    return res.status(500).json({message:"Payment cancellatoin failed"});
+  }
 })
 
 app.listen(3001,() => {

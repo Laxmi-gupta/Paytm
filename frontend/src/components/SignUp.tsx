@@ -19,20 +19,18 @@ export const  SignUp: React.FC = () => {
   const onSubmit = async(formData:SignupCred) => {
     try {
       const res = await api.post('/signup',formData);
-      console.log(res.data)
-      if(!res?.data.ok) {
+      if(!res?.data.success) {
         toast.error(res.data.message);
         return;
       }
 
-      console.log(res.data.message);
       toast.success(res.data.message);
       
       reset(); // Clear form
       navigate("/dashboard"); 
     
     } catch(error:any) {
-      const msg = error?.response?.data.message || "Something went wrong"
+      const msg = error?.response?.data.message || "Signup failed. Please try again."
       console.error("signup eror",msg);
       toast.error(msg)
     }

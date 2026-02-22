@@ -8,10 +8,11 @@ import { prisma } from "../db/prisma.js";
 import { RiskLevel, TransactionStatus } from "@prisma/client";
 import { compare } from "bcrypt";
 import { executep2p } from "../utils/p2p/p2pExecution.service.js";
+import { sendOtpEmail } from "../utils/mail/mail.service.js";
 
 const p2pTypes = z.object({
-  number: z.string().trim(),
-  amount: z.number().min(1).max(10000)   
+  number: z.string().trim().regex(/^[6-9]\d{9}$/, "Invalid mobile number"),
+  amount: z.number().positive("Amount must be greater than 0").max(10000,"Max limit is 10,000")   
 })
 
 const verifyOtpTypes = z.object({
@@ -49,7 +50,7 @@ export class p2p {
         if(!receiver) throw new Error("Receiver not exists")
 
         const userAmount = sender.Balance.amount;
-        // if(userAmount < amount) throw new Error("Balance not sufficient");
+        if(userAmount < amount) throw new Error("Balance not sufficient");
 
         if(sender.id === receiver.id) throw new Error("Cannot send money to yourself");
 
@@ -86,7 +87,9 @@ export class p2p {
         if(updated_intent.riskLevel===RiskLevel.Medium) {
 
           let otp = generateOtp();
-          console.log("otp",otp)
+          if (process.env.NODE_ENV === "development") {
+            console.log("otp", otp);
+          }
           let otpHash = await hashOtp(otp);
 
           await tx.transactionOtp.create({
@@ -97,9 +100,9 @@ export class p2p {
               attempts:0 
             }
           });
-
+          console.log("otp created");
          // send otp to sms
-         
+          await sendOtpEmail(sender.email, otp);
         }
 
         if(updated_intent.riskLevel===RiskLevel.Low) {
@@ -127,7 +130,7 @@ export class p2p {
           intentId: result.intentId,
           riskLevel: result.riskLevel,
           status: result.status,
-          message: "Otp sent"
+          message: "Otp sent to mail"
         })
       }
      
@@ -174,6 +177,10 @@ export class p2p {
 
         if(new Date() > dbOtpHash.expiredAt) throw new Error("Otp expired");
 
+        if (dbOtpHash.attempts >= 3) {
+          throw new Error("Too many attempts. Transaction blocked.");
+        }
+
         const isValid = await compare(otp,dbOtpHash.otpHash);
 
         if(!isValid) {
@@ -189,7 +196,11 @@ export class p2p {
           data: {status: "Approved"}
         })
 
-        await executep2p(tx,updated_intent)
+        await executep2p(tx,updated_intent);
+
+        await tx.transactionOtp.delete({
+          where: { intentId }
+        });
       })
       return res.status(200).json({success: true,message:"Transfer successful",intentId})
     } 
@@ -203,35 +214,30 @@ export class p2p {
     } 
   }
 
-  // static p2pExecute = async (req:Request,res:Response) => {
-  //   try {
-  //     const intentId = req.body.intentId;
-  //     const userId = (req as any).userId;
-      
-  //     if(!intentId) return res.status(400).json({message: "no intent found"});
+   static getSuccessData = async(req:Request,res:Response) => {
+     try {
+      const intentId = req.query.intentId;
+      if(!intentId) return Send.error(res,"Intent missing");
 
-  //     const intent = await prisma.transactionIntent.findUnique({
-  //       where: {id:intentId}
-  //     })
-  //     console.log("intent ",intent)
-  //     if(!intent) return res.status(400).json({message: "no intent found"});
+      const data = await prisma.transactionIntent.findUnique(
+        {
+          where:{id:Number(intentId)},
+          select:{
+            amount:true,status:true,
+            sender: {select:  {email:true}},
+            receiver: {select: {email: true}}
+          },
+        });
 
-  //     if(intent.status === "Executed") return res.status(400).json({message:"Already executed"})
+      if (!data) {
+        return Send.error(res, "P2p Success data not found");
+      }
 
-  //     if(intent.status!=="Approved") return res.status(400).json({message: "otp not verified"})
-        
-  //     if(userId!==intent.senderId) return res.status(403).json({message: "Unauthorized"})
-      
-  //     if(!intent.senderId) return res.status(400).json({message:"Invalid intent"})
-
-  //     // p2p transfer create
-  //     await prisma.$transaction(async(tx) => {
-  //       await executep2p(tx,intent);
-  //       return res.status(200).json({success: true,message: "executed"});
-  //     })
-  //   } catch(err:any) {
-  //       console.error("p2p execution failed",err.message);
-  //       return res.status(400).json({success: false,message:err.message || "Execution failed"});
-  //   }
-  // }
+      return Send.success(res,data);
+    } catch(error) {
+      console.error("getSuccessData failed",error);
+      return Send.error(res,"get P2p Success Data failed");
+    }
+    
+  }
  }

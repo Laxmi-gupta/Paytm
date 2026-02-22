@@ -1,7 +1,7 @@
 import type { Request,Response } from "express"
 import { authSchema } from "shared-validation-schemas"
 import { PrismaClient } from "@prisma/client"
-import {z} from "zod"
+import {success, z} from "zod"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { authConfig } from "../config/auth.config.js"
@@ -22,18 +22,26 @@ export class Auth {
       res.clearCookie("refreshToken");
 
       const validated = authSchema.login.safeParse(req.body);
-      console.log("login backedn route",validated);
-      if(!validated.success) return Send.error(res,null,"Invalid input");
+      if(!validated.success) return res.status(400).json({
+        success: false,
+        message: "Invalid email or password format"
+      });
       const {email,password} = validated.data;
       const user = await prisma.user.findUnique({where: {email}});
     
-      if(!user) {
-        return Send.error(res,null,"User not exists");
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User does not exist"
+        });
       }
 
       const isValidUser = await bcrypt.compare(password,user.password);      
       if(!isValidUser) {
-        return Send.error(res,null,"Password is incorrect");
+        return res.status(401).json({
+          success: false,
+          message: "Incorrect password"
+        });
       }
 
       const {accessToken,refreshToken} = generateToken({id: user.id});
@@ -54,15 +62,20 @@ export class Auth {
         sameSite: "strict"
       });
 
-      return Send.success(res,{
+      return res.status(200).json({
+          success: true,
+          message: "Login successful",
+          data: {
           id:user.id,
           name: user.name,
-          email:user.email,
+          email:user.email}
         } 
       )
     } catch(error) {
-      console.log("Login failed",error);
-      return Send.error(res,null,"Login failed");
+      return res.status(500).json({
+        success: false,
+        message: "Something went wrong"
+      });
     }
   }
 
@@ -72,7 +85,6 @@ export class Auth {
       res.clearCookie("accessToken");
       res.clearCookie("refreshToken");
 
-      console.log(req.body);
       const validated = authSchema.register.safeParse(req.body);
       
       if(!validated.success) return Send.error(res,null,"Invalid input");
@@ -81,12 +93,16 @@ export class Auth {
       
       const exisited = await prisma.user.findUnique({where: {email}})
       if(exisited) {
-        return Send.error(res, null, "Email already exists.");
+        return res.status(400).json({
+        success: false,
+        message: "Email already exists."});
       }
 
       const exisitedPhone = await prisma.user.findUnique({where: {number}})
       if(exisitedPhone) {
-        return Send.error(res, null, "Phone number already exists.");
+       res.status(400).json({
+        success: false,
+        message: "Phone number already exists."});
       }
   
       const user = await prisma.user.create({
@@ -101,8 +117,7 @@ export class Auth {
         }
       });
 
-     const {accessToken,refreshToken} = generateToken({id: user.id});    
-     console.log("user token",user) 
+     const {accessToken,refreshToken} = generateToken({id: user.id});  
 
      await prisma.user.update({where: {id: user.id},data:{refreshToken}});
 
@@ -120,11 +135,15 @@ export class Auth {
         sameSite: "strict"
       });
 
-      return Send.success(res, {
-          id: user.id,
+      return res.status(200).json({
+          success: true,
+          message: "User created succesfully",
+          data: {
+          id:user.id,
           name: user.name,
-          email: user.email
-      },"User created succesfully")
+          email:user.email}
+        } 
+      )
       
     } catch(error) {
       console.log("Register failed",error);
@@ -154,7 +173,6 @@ export class Auth {
   static refreshToken = async(req:Request,res:Response) => {
     try{
       const refreshToken = req.cookies.refreshToken;
-      console.log("refresh token",refreshToken)
       if(!refreshToken) {
         return Send.unAuthorized(res, { message: "No refresh token provided" });
       }
@@ -187,7 +205,7 @@ export class Auth {
         sameSite:"strict",
         secure: process.env.NODE_ENV === "production"
       })
-      console.log("new access token",newAccessToken)
+      
       return Send.success(res,"Access token refresh successfully")
     } catch(error) {
       console.log("Refresh token failed",error);

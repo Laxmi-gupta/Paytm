@@ -49,8 +49,7 @@ export const Navbar: React.FC = () => {
               <Wallet size={16} className="text-white" />
             </div>
             <div className="flex items-baseline">
-              <h2 className="text-2xl font-bold text-black">Pay</h2>
-              <h2 className="text-2xl font-bold text-black">X</h2>
+              <h2 className="text-2xl font-bold text-black">PayX</h2>
             </div>
           </div>
         </Link>

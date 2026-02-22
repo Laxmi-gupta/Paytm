@@ -5,35 +5,17 @@ import {ArrowUpRight, CreditCard, Plus, Send, Wallet} from "lucide-react"
 import { TransactionsTable } from "./TransactionsTable";
 import type { userSchema } from "./types/transHistory.type";
 
-// type userSchema = {   
-//   id: number;
-//   name: string;
-//   Balance : {
-//     amount: number
-//   },
-//   // trsn details
-//   ledgerEntries: {
-//     id: number,
-//     amount: number,
-//     mode: "Credit" | "Debit",
-//     createdAt: string, 
-//   },
-//   sendTransfers: {
-//     status: string,
-//     receiver: {
-//       name: string
-//     }
-//   }
-// }  
-
 export const Dashboard = ():JSX.Element => {
   const [user,setUser] = useState<userSchema | null>(null);
 
   useEffect(() => {
     const fetchUserDetails = async() => {
-      const res = await api.get(`${import.meta.env.VITE_API_URL}/dashboard`)
-      // console.log(res.data.data)
-      setUser(res.data.data)
+      try {
+      const res = await api.get(`/dashboard`);
+      setUser(res.data.data);
+    } catch (error: any) {
+      console.error(error);
+    }
     }
     fetchUserDetails();
   },[]) 
@@ -49,9 +31,9 @@ export const Dashboard = ():JSX.Element => {
     <div className="px-40 py-8 bg-gray-50 min-h-screen">
       <div>
         <h1 className="text-3xl font-semibold mb-1">Hello, {user?.name}</h1>
-        <p className="text-gray-500 mb-8">Welcom back to PayX</p>
-        <div className="grid grid-cols-3 gap-6">
-          <div className="col-span-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-2xl p-6 shadow-lg overflow-hidden relative">
+        <p className="text-gray-500 mb-8">Welcome back to PayX</p>
+        <div className="grid grid-cols-5 gap-6">
+          <div className="col-span-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-2xl p-6 shadow-lg overflow-hidden relative">
             <div className="flex items-center gap-2 text-sm opacity-90 mb-1">
               <Wallet size={40} className="bg-white/20 p-2 rounded-md" />
               <div>
@@ -64,17 +46,39 @@ export const Dashboard = ():JSX.Element => {
             <p className="text-sm opacity-80">Indian rupees</p>
           </div>
 
-          <div>
-            <h3 className="font-semibold mb-4">Quick Actions</h3>
-            <div className="flex">
-              <Link to="/transaction" className="flex items-center gap-3 bg-green-500 text-white rounded-xl p-6 font-medium shadow hover:bg-green-600 transition">
-                <Plus className="bg-white/20 p-1 rounded-md" />
-                <p className="block">Add money</p>
+          <div className="col-span-2">
+            <h3 className="font-semibold text-lg mb-4">Quick Actions</h3>
+
+            <div className="flex gap-6">
+              
+              {/* P2P Transfer Card */}
+              <Link
+                to="/p2p"
+                className="flex items-center gap-4 bg-white border border-gray-200 rounded-2xl p-6  shadow-sm w-68 hover:shadow-lg transition"
+              >
+                <div className="bg-indigo-600 text-white p-4 rounded-xl">
+                  <Send size={20} />
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-800">P2P Transfer</p>
+                  <p className="text-sm text-gray-500">Send money to anyone</p>
+                </div>
               </Link>
-            
-              <Link to="/p2p" className="flex items-center gap-3 ml-4 bg-blue-600 text-white rounded-xl p-6 font-medium shadow hover:bg-blue-700 transition">
-                <Send className="bg-white/20 p-1 rounded-md" />
-                <p className="block">Send money</p></Link>
+
+              {/* Add Money Card */}
+              <Link
+                to="/transaction"
+                className="flex items-center gap-4 bg-white border border-gray-200 rounded-2xl p-6 w-68 shadow-sm hover:shadow-lg transition"
+              >
+                <div className="bg-gray-100 text-indigo-600 p-4 rounded-xl">
+                  <Plus size={20} />
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-800">Add Money</p>
+                  <p className="text-sm text-gray-500">On-ramp from bank</p>
+                </div>
+              </Link>
+
             </div>
           </div>
         </div>
@@ -87,7 +91,7 @@ export const Dashboard = ():JSX.Element => {
                 <div className="bg-blue-600 p-3 rounded-lg w-12 mb-2">
                   <CreditCard size={20} className="text-white" />
                 </div>
-              {user?.balance.toLocaleString()}
+              Rs. {user?.balance.toLocaleString() ?? 0}
             </div>
             <div className="text-gray-500 text-sm my-2">Total Balance</div>
           </div>
@@ -98,7 +102,7 @@ export const Dashboard = ():JSX.Element => {
                <div className="bg-blue-600 p-3 rounded-lg w-12 mb-2">
                   < ArrowUpRight size={20} className="text-white"/>
                 </div>
-              Rs. {latestTxn?.amount}
+              Rs. {latestTxn?.amount ?? 0}
             </div>
             <div className="text-gray-500 text-sm my-2 ">Last Transaction</div>
           </div>
@@ -109,7 +113,7 @@ export const Dashboard = ():JSX.Element => {
                <div className="bg-blue-600 p-3 rounded-lg w-12 mb-2">
                 <CreditCard  className=" text-white" size={20}/>
               </div>
-              {user?.transactions.length}
+              {user?.transactions.length ?? 0}
             </div>
             <div className="text-gray-500 text-sm my-2">Total Transactions</div>
           </div>
