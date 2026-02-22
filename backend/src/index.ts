@@ -13,19 +13,9 @@ import OnRampRoutes from "./routes/onramp.routes.js";
 import P2pRoutes from "./routes/p2p.routes.js";
 
 const app = express();
-const allowedOrigins = [
-  "http://localhost:5173",
-  process.env.FRONTEND_URL
-];
 
 app.use(cors({
-  origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("CORS blocked"));
-      }
-    },
+  origin:true,
   credentials:true
 }))
 
