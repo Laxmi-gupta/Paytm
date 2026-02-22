@@ -20,6 +20,8 @@ const verifyOtpTypes = z.object({
   otp: z.string().trim().min(6)
 })
 
+let emailToSend: { email: string; otp: string } | null = null;
+
 export class p2p {
   static p2pTransfer = async (req:Request,res:Response) => {
     try {
@@ -100,8 +102,12 @@ export class p2p {
               attempts:0 
             }
           });
-         // send otp to sms
-          await sendOtpEmail(sender.email, otp);
+
+           emailToSend = {
+            email: sender.email,
+            otp
+          };
+         
         }
 
         if(updated_intent.riskLevel===RiskLevel.Low) {
@@ -111,6 +117,15 @@ export class p2p {
 
         return {intentId:updated_intent.id,status: updated_intent.status,riskLevel:updated_intent.riskLevel,reason: updated_intent.decisionReason};
       })
+
+      //send email
+      if (emailToSend) {
+        try {
+          await sendOtpEmail(emailToSend.email, emailToSend.otp);
+        } catch (err) {
+          console.error("Email failed but transaction kept", err);
+        }
+      }
 
       // we hv used result bcoz inside trsntn we cant return -< means Run DB logic atomically and RETURN ONE VALUE to the outside world
       // $transaction should ONLY create/update DB rows and RETURN a summary
