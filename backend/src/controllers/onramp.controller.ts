@@ -17,7 +17,7 @@ export class OnRamp {
       const {amount,provider} = validated.data;
       if(amount<=0) return Send.error(res,"Invalid amount");
 
-      const response = await axios.post("http://localhost:3001/bank/make-payment",{
+      const response = await axios.post(`${process.env.BANK_URL}/bank/make-payment`,{
         userId,amount,provider
       })
       //console.log(response.data);  
