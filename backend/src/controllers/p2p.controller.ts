@@ -20,8 +20,6 @@ const verifyOtpTypes = z.object({
   otp: z.string().trim().min(6)
 })
 
-let emailToSend: { email: string; otp: string } | null = null;
-
 export class p2p {
   static p2pTransfer = async (req:Request,res:Response) => {
     try {
@@ -33,6 +31,8 @@ export class p2p {
       const senderId = (req as any).userId;
       if(!senderId) return res.status(401).json({message: "Not authorized"});
       
+      let emailToSend: { email: string; otp: string } | null = null as { email: string; otp: string } | null;
+
       let result = await prisma.$transaction(async(tx) => {
         const sender = await tx.user.findUnique({
           where: {id: senderId},
