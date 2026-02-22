@@ -1,6 +1,5 @@
 import type React from "react";
-import { saveUser } from "../services/authService";
-import { data, Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { authSchema, type SignupCred} from "shared-validation-schemas"
