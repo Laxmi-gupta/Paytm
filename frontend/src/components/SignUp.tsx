@@ -57,7 +57,7 @@ export const  SignUp: React.FC = () => {
             {/* Name */}
             <div className="mb-4">
               <div className="flex items-center gap-4">
-                <img src="/src/assets/download.svg" />
+                <img src="/download.svg" />
                 <div className="w-full">
                   <label className="text-sm text-gray-600">Name</label>                 
                   <input
@@ -73,7 +73,7 @@ export const  SignUp: React.FC = () => {
             {/* Email */}
             <div className="mb-4">
               <div className="flex items-center gap-4">
-                <img src="/src/assets/download.svg" />
+                <img src="/download.svg" />
                 <div className="w-full">
                   <label className="text-sm text-gray-600">Email</label>                 
                   <input
@@ -89,7 +89,7 @@ export const  SignUp: React.FC = () => {
             {/* Password */}
             <div className="mb-4">
               <div className="flex items-center gap-4">
-                <img src="/src/assets/password.svg" />
+                <img src="/password.svg" />
                 <div className="w-full">
                   <label className="text-sm text-gray-600">Password</label>                 
                   <input
@@ -105,7 +105,7 @@ export const  SignUp: React.FC = () => {
             {/* Phone */}
             <div className="mb-4">
               <div className="flex items-center gap-4">
-                <img src="/src/assets/download.svg" />
+                <img src="/download.svg" />
                 <div className="w-full">
                   <label className="text-sm text-gray-600">Phone Number</label>                 
                   <input
