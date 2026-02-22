@@ -89,9 +89,8 @@ export class p2p {
         if(updated_intent.riskLevel===RiskLevel.Medium) {
 
           let otp = generateOtp();
-          if (process.env.NODE_ENV === "development") {
-            console.log("otp", otp);
-          }
+          console.log("otp", otp);
+          
           let otpHash = await hashOtp(otp);
 
           await tx.transactionOtp.create({
