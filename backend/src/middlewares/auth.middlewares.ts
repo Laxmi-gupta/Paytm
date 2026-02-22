@@ -11,14 +11,12 @@ export class AuthMiddleware {
   static authenticateUser = (req:Request,res:Response,next: NextFunction) => {
     try {
       const token = req.cookies.accessToken;
-      console.log("authenticate",token)
       if(!token) {
         return Send.unAuthorized(res,null,"Token not exists");
       }
 
       const decodedToken = jwt.verify(token,authConfig.secret) as decodedTok;
       (req as any).userId = decodedToken.userId;    // cant be decodeed in controller so here string norrmal variabel
-      console.log("req user",(req as any).userId)
       next();   // if not call then it will stuck here only
     } catch(error) {
       console.log("Authenticate user failed",error);

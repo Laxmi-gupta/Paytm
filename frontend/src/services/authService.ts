@@ -1,11 +1,8 @@
-import axios from "axios";
 import type { loginSchema, signUpSchema } from "../types/auth.types";
-
-const URL = import.meta.env.VITE_API_URL;
-console.log(URL)
+import { api } from "../utils/axios";
 
 export const saveUser = async(formData: signUpSchema) => {
-  const res = await axios.post(`${URL}/signup`, formData, {
+  const res = await api.post(`/signup`, formData, {
     headers: {
       'Content-Type': 'application/json',
     },
@@ -14,6 +11,6 @@ export const saveUser = async(formData: signUpSchema) => {
 }
 
 export const logInUser = async(formData:loginSchema) => {
-  const res = await axios.post(`${URL}/login`,formData,{ withCredentials: true });
+  const res = await api.post(`/login`,formData,{ withCredentials: true });
   return res.data;
 }

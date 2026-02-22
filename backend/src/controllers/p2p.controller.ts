@@ -100,7 +100,6 @@ export class p2p {
               attempts:0 
             }
           });
-          console.log("otp created");
          // send otp to sms
           await sendOtpEmail(sender.email, otp);
         }

@@ -13,7 +13,7 @@ api.interceptors.response.use(
   async (error) => {
     // console.log(error);
     const originalReq = error.config;
-    if(error.response?.status==401 && !originalReq._retry) {
+    if(error.response?.status==401 && !originalReq._retry && originalReq.url !== "/refresh-token") {
       try {
         originalReq._retry = true;          // Prevents infinite retry loops
         await api.post('/refresh-token');

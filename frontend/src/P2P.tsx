@@ -34,7 +34,6 @@ export const P2P:React.FC = () => {
   const onSubmit = async(data:Payment) => {
     try {
       const res = await saveP2pData(data);
-      console.log(res);
 
       if(!res.success) {
         toast.error(res.message)

@@ -27,6 +27,10 @@ app.get('/',(req,res) => {
   res.send("root route")
 })
 
+app.get("/me", AuthMiddleware.authenticateUser, (req, res) => {
+  res.json({ userId: (req as any).userId });
+});
+
 app.use(AuthRoutes);
 
 app.get('/dashboard',AuthMiddleware.authenticateUser,Dashboard.getUser);

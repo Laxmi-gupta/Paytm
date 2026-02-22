@@ -1,6 +1,8 @@
 import express from "express";
 import crypto from "crypto";
 import axios from "axios";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 app.use(express.json());   // if we need access req.body we need to convert it in json
@@ -17,15 +19,13 @@ app.post('/bank/make-payment',async(req,res) => {
   payment[token] = {
     userId,amount,provider,status:"pending"
   } 
-  res.json({token,paymentUrl: `http://localhost:3001/bank/pay?token=${token}`}) 
+  res.json({token,paymentUrl: `${process.env.BANK_BASE_URL}/bank/pay?token=${token}`}) 
 
 });
 
 
 app.get('/bank/pay',(req,res) => {
   const token = req.query.token;
-  console.log("payment page",token)
-  console.log("payment success",payment[token]);
   if(!token) return Send.error(res,null,"Token not found");
   
   res.send(`
@@ -165,9 +165,8 @@ app.post('/bank/pay/complete',async(req,res) => {
     if(!token || !payment[token]) return res.json({message:"Token invalid"});
     const {userId,amount} = payment[token];
     payment[token].status="success";
-    const webhook  = await axios.post('http://localhost:3000/webhooks',{token,userId,amount,status:"Success"});
-    // console.log("webhook",webhook); 
-    res.redirect(`http://localhost:5173/success-payment?token=${token}`);
+    const webhook  = await axios.post(`${process.env.BACKEND_WEBHOOK_URL}/webhooks`,{token,userId,amount,status:"Success"});
+    res.redirect(`${process.env.FRONTEND_URL}/success-payment?token=${token}`);
   } catch(error) {
     console.error("Payment failed",error);
     return res.status(500).json({data:payment});
@@ -180,9 +179,9 @@ app.post('/bank/pay/cancel',async(req,res) => {
     if(!token || !payment[token]) return res.json({message:"Token invalid"});
     const {userId,amount} = payment[token];
     payment[token].status = "failed";
-    await axios.post('http://localhost:3000/webhooks',{token,userId,amount,status:"Failed"});
+    await axios.post(`${process.env.BACKEND_WEBHOOK_URL}/webhooks`,{token,userId,amount,status:"Failed"});
     return res.redirect(
-      `http://localhost:5173/payment-failed?token=${token}`
+      `${process.env.FRONTEND_URL}/payment-failed?token=${token}`
     );
   } catch(err) {
      console.error("Payment cancellatoin failed",err);
@@ -190,6 +189,6 @@ app.post('/bank/pay/cancel',async(req,res) => {
   }
 })
 
-app.listen(3001,() => {
+app.listen(process.env.PORT,() => {
   console.log("app listienng 3001")
 })

@@ -13,6 +13,7 @@ import { Dashboard } from './Dashboard'
 import { SuccessTxn } from './SuccessTxn'
 import { Success } from './Success'
 import { Failed } from './Failed'
+import { ProtectedRoute } from './ProtectedRoute'
 
 // add protected routes to prevent url navigation
 
@@ -23,11 +24,11 @@ const router = createBrowserRouter([
     children: [{
       path: '/',element: <Home/>  
     },{
-      path: '/dashboard' ,element: <Dashboard /> 
+      path: '/dashboard' ,element: <ProtectedRoute> <Dashboard /> </ProtectedRoute>
     },{
-      path:'/transaction',element: <Transactions />         
+      path:'/transaction',element: <ProtectedRoute> <Transactions />  </ProtectedRoute>     
     },{
-      path: '/p2p', element: <P2P/>
+      path: '/p2p', element: <ProtectedRoute> <P2P/> </ProtectedRoute>
     }]
   },   
   {
@@ -40,15 +41,15 @@ const router = createBrowserRouter([
   },
   {
     path: '/success-payment',
-    element: <Success/>
+    element: <ProtectedRoute> <Success/> </ProtectedRoute>
   },
   {
     path: '/payment-failed',
-    element: <Failed/>
+    element: <ProtectedRoute> <Failed/> </ProtectedRoute>
   },
   {
     path: '/success-p2p',
-    element: <SuccessTxn/>
+    element: <ProtectedRoute> <SuccessTxn/> </ProtectedRoute>
   }
 ])
 

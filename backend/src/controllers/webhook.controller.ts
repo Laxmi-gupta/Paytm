@@ -69,7 +69,6 @@ export class Webhook {
           where: { token },
           data: { status: "Success" }
         });
-        console.log("database updated")
       })
       return res.status(200).json({message:"db updated"})
     } catch(err) {
