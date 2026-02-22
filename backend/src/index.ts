@@ -5,8 +5,7 @@ import { appConfig } from "./config/app.config.js";
 import { AuthMiddleware } from "./middlewares/auth.middlewares.js";
 import { OnRamp } from "./controllers/onramp.controller.js";
 import cors from "cors";
-import { p2p } from "./controllers/p2p.controller.js";
-import axios from "axios";
+import type { Request,Response } from "express";
 import { Dashboard } from "./controllers/dashboard.controller.js";
 import { Webhook } from "./controllers/webhook.controller.js";
 import AuthRoutes from "./routes/auth.routes.js";
@@ -23,11 +22,7 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser()) // Express will parse all cookies and store them inside req.cookies
 
-app.get('/',(req,res) => {
-  res.send("root route")
-})
-
-app.get("/me", AuthMiddleware.authenticateUser, (req, res) => {
+app.get("/me", AuthMiddleware.authenticateUser, (req:Request, res:Response) => {
   res.json({ userId: (req as any).userId });
 });
 
