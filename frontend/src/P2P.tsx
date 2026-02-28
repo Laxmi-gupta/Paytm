@@ -44,6 +44,7 @@ export const P2P:React.FC = () => {
       }
 
        if(res.riskLevel==="Medium") {
+        console.log("res",res);
         setIntentId(res.intentId);
         toast.success(res.message);
         SetOtpBox(true);
