@@ -1,10 +1,15 @@
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+const EMAIL_FROM = process.env.EMAIL_FROM;
+
+if (!EMAIL_FROM) {
+  throw new Error("EMAIL_FROM environment variable is not defined");
+}
 
 export const sendOtpEmail = async (to: string, otp: string) => {
    await resend.emails.send({
-      from: process.env.EMAIL_FROM, // must be verified domain
+      from: EMAIL_FROM, // must be verified domain
       to: to,
       subject: "Your OTP Code",
       html: `
