@@ -8,6 +8,7 @@ if (!EMAIL_FROM) {
 }
 
 export const sendOtpEmail = async (to: string, otp: string) => {
+  console.log("sending otp to",to);
    await resend.emails.send({
       from: EMAIL_FROM, // must be verified domain
       to: to,
