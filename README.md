@@ -69,8 +69,8 @@ JWT_REFRESH_KEY=your_refresh_token
 JWT_REFRESH_EXPIRES="24h"
 FRONTEND_URL=https://localhost:5173
 BANK_URL=https://localhost:3001
-MAIL_PASS=google_app_password
-MAIL_USER=gmail_google
+RESEND_API=google_app_password
+EMAIL_FROM=gmail_google
 ```
 
 ### Bank Service (`dummy-bank/.env`)

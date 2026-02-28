@@ -1,22 +1,20 @@
-import nodemailer from "nodemailer"
-export const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.MAIL_USER,
-    pass: process.env.MAIL_PASS
-  }
-});
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendOtpEmail = async (to: string, otp: string) => {
-  await transporter.sendMail({
-    from: `"PayX Security" <${process.env.MAIL_USER}>`,
-    to,
-    subject: "Your OTP for P2P Transfer",
-    html: `
-      <h2>Verify Your Transfer</h2>
-      <p>Your OTP is:</p>
-      <h1>${otp}</h1>
-      <p>Valid for 5 minutes.</p>
-    `
-  });
+   await resend.emails.send({
+      from: process.env.EMAIL_FROM, // must be verified domain
+      to: to,
+      subject: "Your OTP Code",
+      html: `
+        <div style="font-family: Arial; padding: 20px;">
+          <h2>Your OTP Code</h2>
+          <p>Your verification code is:</p>
+          <h1 style="letter-spacing: 5px;">${otp}</h1>
+          <p>This OTP is valid for 5 minutes.</p>
+          <p>If you did not request this, please ignore.</p>
+        </div>
+      `,
+    });
 };
