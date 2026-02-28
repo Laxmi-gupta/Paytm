@@ -45,7 +45,7 @@ export const P2P:React.FC = () => {
 
        if(res.riskLevel==="Medium") {
         setIntentId(res.intentId);
-        toast.success("Otp send to your registered email");
+        toast.success(res.message);
         SetOtpBox(true);
         return;
       }

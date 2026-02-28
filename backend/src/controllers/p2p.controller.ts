@@ -143,7 +143,7 @@ export class p2p {
           intentId: result.intentId,
           riskLevel: result.riskLevel,
           status: result.status,
-          message: "Otp sent to mail"
+          message: result.reason
         })
       }
      
