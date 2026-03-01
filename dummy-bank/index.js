@@ -9,6 +9,11 @@ app.use(express.json());   // if we need access req.body we need to convert it i
 app.use(express.urlencoded({ extended: true }));
 
 const payment = {};
+
+app.get("/", (req, res) => {
+  res.status(200).send("Bank server running");
+});
+
 app.post('/bank/make-payment',async(req,res) => {
   const {userId, amount,provider} = req.body;     
   if(!userId || !amount || !provider) {
