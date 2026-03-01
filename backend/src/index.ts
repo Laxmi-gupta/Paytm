@@ -26,6 +26,10 @@ app.get("/me", AuthMiddleware.authenticateUser, (req:Request, res:Response) => {
   res.json({ userId: (req as any).userId });
 });
 
+app.get("/", (req, res) => {
+  res.status(200).send("Backend running");
+});
+
 app.use(AuthRoutes);
 
 app.get('/dashboard',AuthMiddleware.authenticateUser,Dashboard.getUser);
